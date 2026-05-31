@@ -28,12 +28,14 @@ public class ImportController {
         this.importJobService = importJobService;
     }
 
+
     @PostMapping("/products")
     public ResponseEntity<ImportJob> importProducts(@RequestParam("file") MultipartFile file) throws Exception {
         ImportJob job = importJobService.create(file.getOriginalFilename(), "PRODUCTS");
         parserProduct.parseProducts(file.getBytes(), job.getId());
         return ResponseEntity.accepted().body(job);
     }
+
 
     @PostMapping("/separation-operations")
     public ResponseEntity<ImportJob> importSeparationOperations(@RequestParam("file") MultipartFile file) throws Exception {
@@ -42,10 +44,17 @@ public class ImportController {
         return ResponseEntity.accepted().body(job);
     }
 
+    
     @PostMapping("/separated-products")
     public ResponseEntity<ImportJob> importSeparatedProducts(@RequestParam("file") MultipartFile file) throws Exception {
         ImportJob job = importJobService.create(file.getOriginalFilename(), "SEPARATED_PRODUCTS");
         parserSeparationProducts.parseSeparatedProducts(file.getBytes(), job.getId());
         return ResponseEntity.accepted().body(job);
+    }
+
+
+    @GetMapping("/status/{jobId}")
+    public ResponseEntity<ImportJob> status(@PathVariable Long jobId) {
+        return ResponseEntity.accepted().body(importJobService.findById(jobId));
     }
 }

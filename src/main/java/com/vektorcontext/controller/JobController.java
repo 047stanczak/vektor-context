@@ -17,9 +17,14 @@ public class JobController {
         this.importJobService = importJobService;
     }
     
+    
     @GetMapping("/status/{jobId}")
     public ResponseEntity<ImportJob> status(@PathVariable Long jobId) {
-        return ResponseEntity.accepted().body(importJobService.findById(jobId));
+        ImportJob job = importJobService.findById(jobId);
+        if (job == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(job);
     }
 
 }
