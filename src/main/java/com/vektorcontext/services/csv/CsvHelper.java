@@ -10,6 +10,9 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.text.Normalizer;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
@@ -97,6 +100,30 @@ public class CsvHelper {
                 .replace(",", ".");
 
         return Double.parseDouble(cleaned);
+    }
+
+    public LocalDate parseDate(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+
+        String cleaned = value.trim();
+        DateTimeFormatter[] formatters = new DateTimeFormatter[] {
+                DateTimeFormatter.ofPattern("d/M/yy"),
+                DateTimeFormatter.ofPattern("dd/MM/yy"),
+                DateTimeFormatter.ofPattern("d/M/yyyy"),
+                DateTimeFormatter.ofPattern("dd/MM/yyyy"),
+                DateTimeFormatter.ISO_LOCAL_DATE
+        };
+
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                return LocalDate.parse(cleaned, formatter);
+            } catch (DateTimeParseException ignored) {
+            }
+        }
+
+        throw new IllegalArgumentException("Formato de data inválido: " + value);
     }
 
     private String normalizeHeader(String header) {
