@@ -1,5 +1,7 @@
 package com.vektorcontext.models;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -19,8 +21,18 @@ public class SeparatedProduct {
     @Column(name = "product_code", nullable = false)
     private Integer productCode;
 
+    @Column(name = "store_code", nullable = false)
+    private Integer storeCode;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_code", referencedColumnName = "code", nullable = false, insertable = false, updatable = false)
+    private Product product;
+
     @Column(name = "quantity", nullable = false)
     private Double quantity;
+
+    @Column(name = "date", nullable = false)
+    private LocalDate date;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
@@ -63,6 +75,22 @@ public class SeparatedProduct {
         this.productCode = productCode;
     }
 
+    public Integer getStoreCode() {
+        return storeCode;
+    }
+
+    public void setStoreCode(Integer storeCode) {
+        this.storeCode = storeCode;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
     public Double getQuantity() {
         return quantity;
     }
@@ -79,5 +107,11 @@ public class SeparatedProduct {
         this.separationOperation = separationOperation;
     }
 
-    
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
 }
