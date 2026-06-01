@@ -1,5 +1,12 @@
-spring.datasource.url=urlDB
-spring.datasource.username=userDB
-spring.datasource.password=userPassword
-spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
-spring.jpa.hibernate.ddl-auto=update
+spring.datasource.url=jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+spring.datasource.username=${DB_USER}
+spring.datasource.password=${DB_PASSWORD}
+spring.jpa.database-platform=${DB_PLATFORM}
+spring.jpa.hibernate.ddl-auto=${DDL_AUTO}
+
+spring.mvc.async.request-timeout=${SERVER_TIMEOUT}
+server.connection-timeout=-1
+server.tomcat.connection-timeout=${SERVER_TIMEOUT}
+
+spring.servlet.multipart.max-file-size=${MAX_FILE_SIZE}
+spring.servlet.multipart.max-request-size=${MAX_FILE_SIZE}
