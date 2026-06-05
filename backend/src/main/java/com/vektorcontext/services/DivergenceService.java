@@ -7,6 +7,7 @@ import com.vektorcontext.models.DivergenceRecord;
 import com.vektorcontext.models.Product;
 import com.vektorcontext.repository.DivergenceRecordRepository;
 import com.vektorcontext.repository.ProductRepository;
+import com.vektorcontext.repository.StockSnapshotRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -20,13 +21,16 @@ public class DivergenceService {
 
     private final DivergenceRecordRepository divergenceRecordRepository;
     private final ProductRepository productRepository;
+    private final StockSnapshotRepository stockSnapshotRepository;
     private final TransactionFinder transactionFinder;
 
     public DivergenceService(DivergenceRecordRepository divergenceRecordRepository,
                              ProductRepository productRepository,
+                             StockSnapshotRepository stockSnapshotRepository,
                              TransactionFinder transactionFinder) {
         this.divergenceRecordRepository = divergenceRecordRepository;
         this.productRepository = productRepository;
+        this.stockSnapshotRepository = stockSnapshotRepository;
         this.transactionFinder = transactionFinder;
     }
 
@@ -89,7 +93,7 @@ public class DivergenceService {
         if (records.isEmpty()) {
             throw new RuntimeException("Nenhuma divergência encontrada para " + date);
         }
-        return enrich(records);
+        return enrichWithStockSnapshot(records, date);
     }
 
     // ── helpers ──────────────────────────────────────────────────────────────
@@ -108,6 +112,27 @@ public class DivergenceService {
         return response;
     }
 
+    private List<DivergenceRecordResponse> enrichWithStockSnapshot(List<DivergenceRecord> records, LocalDate date) {
+        List<Integer> codes = records.stream()
+                .map(DivergenceRecord::getProductCode)
+                .distinct()
+                .toList();
+
+        Map<Integer, Product> productMap = productRepository.findAllById(codes)
+                .stream()
+                .collect(Collectors.toMap(Product::getCode, p -> p));
+
+        return records.stream()
+                .map(r -> {
+                    Double stockFromSnapshot = stockSnapshotRepository
+                            .findByProductCodeAndDate(r.getProductCode(), date)
+                            .map(s -> s.getCurrentStock())
+                            .orElse(0.0);
+                    return toResponse(r, productMap.get(r.getProductCode()), stockFromSnapshot);
+                })
+                .toList();
+    }
+
     private List<DivergenceRecordResponse> enrich(List<DivergenceRecord> records) {
         List<Integer> codes = records.stream()
                 .map(DivergenceRecord::getProductCode)
@@ -119,11 +144,11 @@ public class DivergenceService {
                 .collect(Collectors.toMap(Product::getCode, p -> p));
 
         return records.stream()
-                .map(r -> toResponse(r, productMap.get(r.getProductCode())))
+                .map(r -> toResponse(r, productMap.get(r.getProductCode()), r.getCurrentStock()))
                 .toList();
     }
 
-    private DivergenceRecordResponse toResponse(DivergenceRecord record, Product product) {
+    private DivergenceRecordResponse toResponse(DivergenceRecord record, Product product, Double currentStock) {
         DivergenceRecordResponse response = new DivergenceRecordResponse();
         response.setId(record.getId());
         response.setDate(record.getDate());
@@ -131,7 +156,7 @@ public class DivergenceService {
         response.setProductCode(record.getProductCode());
         response.setTipo(record.getTipo());
         response.setQuantity(record.getQuantity());
-        response.setCurrentStock(record.getCurrentStock());
+        response.setCurrentStock(currentStock);
         response.setSeparatorName(record.getSeparatorName());
         response.setNf(record.getNf());
         response.setObservation(record.getObservation());
