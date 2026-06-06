@@ -12,19 +12,22 @@ import org.springframework.web.multipart.MultipartFile;
 public class ImportController {
 
     private final ParserProduct parserProduct;
-    private final ParserSeparatedProducts parserSeparationProducts;
+    private final ParserSeparatedProducts parserSeparatedProducts;
     private final ParserSeparationOperation parserSeparationOperations;
+    private final ParserSeparationProducts parserSeparationProducts;
     private final ImportJobService importJobService;
 
     public ImportController(
             ParserProduct parserProduct,
-            ParserSeparatedProducts parserSeparationProducts,
+            ParserSeparatedProducts parserSeparatedProducts,
             ParserSeparationOperation parserSeparationOperations,
+            ParserSeparationProducts parserSeparationProducts,
             ImportJobService importJobService
     ) {
         this.parserProduct = parserProduct;
-        this.parserSeparationProducts = parserSeparationProducts;
+        this.parserSeparatedProducts = parserSeparatedProducts;
         this.parserSeparationOperations = parserSeparationOperations;
+        this.parserSeparationProducts = parserSeparationProducts;
         this.importJobService = importJobService;
     }
 
@@ -48,13 +51,14 @@ public class ImportController {
     @PostMapping("/separated-products")
     public ResponseEntity<ImportJob> importSeparatedProducts(@RequestParam("file") MultipartFile file) throws Exception {
         ImportJob job = importJobService.create(file.getOriginalFilename(), "SEPARATED_PRODUCTS");
-        parserSeparationProducts.parseSeparatedProducts(file.getBytes(), job.getId());
+        parserSeparatedProducts.parseSeparatedProducts(file.getBytes(), job.getId());
         return ResponseEntity.accepted().body(job);
     }
 
-
-    @GetMapping("/status/{jobId}")
-    public ResponseEntity<ImportJob> status(@PathVariable Long jobId) {
-        return ResponseEntity.accepted().body(importJobService.findById(jobId));
+    @PostMapping("/separation-products")
+    public ResponseEntity<ImportJob> importSeparationProducts(@RequestParam("file") MultipartFile file) throws Exception {
+        ImportJob job = importJobService.create(file.getOriginalFilename(), "SEPARATION_PRODUCTS");
+        parserSeparationProducts.parseSeparationProducts(file.getBytes(), job.getId());
+        return ResponseEntity.accepted().body(job);
     }
 }
