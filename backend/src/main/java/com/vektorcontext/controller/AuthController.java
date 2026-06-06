@@ -40,10 +40,7 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<Void>> login(
-            @RequestBody LoginRequest request,
-            HttpServletResponse response
-    ) {
+    public ResponseEntity<ApiResponse<Void>> login(@RequestBody LoginRequest request,HttpServletResponse response) {
         User user = authService.authenticate(request);
 
         if (user == null) {
@@ -58,7 +55,7 @@ public class AuthController {
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
-                .maxAge(60 * 60 * 8) // 8 horas
+                .maxAge(60 * 60)
                 .sameSite("Lax")
                 .build();
 
