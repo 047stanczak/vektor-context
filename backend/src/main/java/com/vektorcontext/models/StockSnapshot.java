@@ -23,6 +23,10 @@ public class StockSnapshot {
     @Column(name = "captured_at", nullable = false)
     private LocalDateTime capturedAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_code", referencedColumnName = "code", nullable = false, insertable = false, updatable = false)
+    private Product product;
+
     public Long getId() {
         return id;
     }
@@ -53,5 +57,13 @@ public class StockSnapshot {
 
     public void setCapturedAt(LocalDateTime capturedAt) {
         this.capturedAt = capturedAt;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
     }
 }
