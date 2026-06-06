@@ -91,14 +91,17 @@ public class CsvHelper {
     }
 
     public Double parseDouble(String value) {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
+    if (value == null || value.isBlank()) {
+        return null;
+    }
 
-        String cleaned = value.trim()
-                .replace(".", "")
-                .replace(",", ".");
+    String cleaned = value.trim()
+            .replaceAll("[^0-9.,].*", "")
+            .trim()
+            .replace(".", "")
+            .replace(",", ".");
 
+        if (cleaned.isEmpty()) return null;
         return Double.parseDouble(cleaned);
     }
 

@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class ParserProduct {
@@ -56,29 +55,42 @@ public class ParserProduct {
 
                 Map<String, Integer> headerIndex = csvHelper.buildHeaderIndex(header);
 
-                ProductColumnIndexes columns = resolveProductColumns(headerIndex);
-                Integer currentStockIndex = csvHelper.headerIndex(headerIndex, "estoque", "current_stock", "stock");
+                Integer codeIndex        = csvHelper.headerIndex(headerIndex, "codigo");
+                Integer barcodeIndex     = csvHelper.headerIndex(headerIndex, "codigo_barras");
+                Integer descriptionIndex = csvHelper.headerIndex(headerIndex, "descricao");
+                Integer complementIndex  = csvHelper.headerIndex(headerIndex, "complemento");
+                Integer brandIndex       = csvHelper.headerIndex(headerIndex, "marca");
+                Integer groupIndex       = csvHelper.headerIndex(headerIndex, "grupo");
+                Integer deptIndex        = csvHelper.headerIndex(headerIndex, "dpto");
+                Integer supplierIndex    = csvHelper.headerIndex(headerIndex, "nome_ult_forn");
+                Integer packQtyIndex     = csvHelper.headerIndex(headerIndex, "qtde_emb");
+                Integer stockIndex       = csvHelper.headerIndex(headerIndex, "estoque");
 
                 String[] cols;
 
                 while ((cols = reader.readNext()) != null) {
 
-                    if (csvHelper.isEmptyRow(cols) || csvHelper.col(cols, idx(columns.codeIndex, 0)) == null) {
-                        continue;
-                    }
+                    if (csvHelper.isEmptyRow(cols)) continue;
 
-                    Product product = parseProductFromRow(cols, columns, 0);
-                    if (product == null) {
-                        continue;
-                    }
+                    String codeValue = csvHelper.col(cols, codeIndex);
+                    if (codeValue == null) continue;
+
+                    Product product = new Product();
+                    product.setCode(Integer.parseInt(codeValue));
+                    product.setBarcode(csvHelper.col(cols, barcodeIndex));
+                    product.setDescription(csvHelper.col(cols, descriptionIndex));
+                    product.setComplement(csvHelper.col(cols, complementIndex));
+                    product.setBrand(csvHelper.col(cols, brandIndex));
+                    product.setProductGroup(csvHelper.col(cols, groupIndex));
+                    product.setDepartment(csvHelper.col(cols, deptIndex));
+                    product.setSupplierName(csvHelper.col(cols, supplierIndex));
+                    product.setPackQuantity(csvHelper.parseQuantity(csvHelper.col(cols, packQtyIndex)));
 
                     products.add(product);
 
                     StockSnapshot snapshot = new StockSnapshot();
                     snapshot.setProductCode(product.getCode());
-                    snapshot.setCurrentStock(
-                            csvHelper.parseDouble(csvHelper.col(cols, idx(currentStockIndex, 12)))
-                    );
+                    snapshot.setCurrentStock(csvHelper.parseDouble(csvHelper.col(cols, stockIndex)));
                     snapshot.setCapturedAt(capturedAt);
 
                     snapshots.add(snapshot);
@@ -94,107 +106,12 @@ public class ParserProduct {
         }
     }
 
-    public Product findOrCreateProduct(
-            String[] cols,
-            Map<String, Integer> headerIndex,
-            int codeColumnFallback,
-            Map<Integer, Product> cache
-    ) {
-        Product parsed = parseProductFromRow(cols, resolveProductColumns(headerIndex), codeColumnFallback);
+    public Product findOrCreateProduct(Product parsed) {
         if (parsed == null || parsed.getCode() == null) {
             throw new RuntimeException("Código de produto inválido");
         }
 
-        Integer code = parsed.getCode();
-        if (cache.containsKey(code)) {
-            return cache.get(code);
-        }
-
-        Optional<Product> existing = productRepository.findById(code);
-        if (existing.isPresent()) {
-            cache.put(code, existing.get());
-            return existing.get();
-        }
-
-        productRepository.save(parsed);
-        cache.put(code, parsed);
-        return parsed;
-    }
-
-    public Product parseProductFromRow(String[] cols, Map<String, Integer> headerIndex, int codeColumnFallback) {
-        return parseProductFromRow(cols, resolveProductColumns(headerIndex), codeColumnFallback);
-    }
-
-    private Product parseProductFromRow(String[] cols, ProductColumnIndexes columns, int codeColumnFallback) {
-        String codeValue = csvHelper.col(cols, idx(columns.codeIndex, codeColumnFallback));
-        if (codeValue == null) {
-            return null;
-        }
-
-        Product product = new Product();
-        product.setCode(Integer.parseInt(codeValue));
-        product.setDescription(csvHelper.col(cols, idx(columns.descriptionIndex, 1)));
-        product.setComplement(csvHelper.col(cols, idx(columns.complementIndex, 2)));
-        product.setBrand(csvHelper.col(cols, idx(columns.brandIndex, 3)));
-        product.setProductGroup(csvHelper.col(cols, idx(columns.productGroupIndex, 4)));
-        product.setDepartment(csvHelper.col(cols, idx(columns.departmentIndex, 5)));
-        product.setBarcode(csvHelper.col(cols, idx(columns.barcodeIndex, 6)));
-        product.setSupplierName(csvHelper.col(cols, idx(columns.supplierNameIndex, 10)));
-        product.setPackQuantity(
-            csvHelper.parseQuantity(csvHelper.col(cols, idx(columns.packQuantityIndex, -1)))
-        );
-        return product;
-    }
-
-    private ProductColumnIndexes resolveProductColumns(Map<String, Integer> headerIndex) {
-        return new ProductColumnIndexes(
-                csvHelper.headerIndex(headerIndex, "cod_prod", "codigo_produto", "codigo", "code"),
-                csvHelper.headerIndex(headerIndex, "descricao", "description", "descrição", "produto", "descricao_produto"),
-                csvHelper.headerIndex(headerIndex, "complemento"),
-                csvHelper.headerIndex(headerIndex, "marca"),
-                csvHelper.headerIndex(headerIndex, "grupo", "product_group"),
-                csvHelper.headerIndex(headerIndex, "dpto", "departamento", "department", "dept"),
-                csvHelper.headerIndex(headerIndex, "codigo_barras", "codigobarras", "barcode", "ean"),
-                csvHelper.headerIndex(headerIndex, "nome_ultimo_forn", "nome_ult_forn", "nome_fornecedor", "fornecedor", "nome"),
-                csvHelper.headerIndex(headerIndex, "qtde_emb", "qtde_embalagem", "qtde_emb", "qtde")
-        );
-    }
-
-    private int idx(Integer index, int fallback) {
-        return index == null ? fallback : index;
-    }
-
-    private static final class ProductColumnIndexes {
-        private final Integer codeIndex;
-        private final Integer descriptionIndex;
-        private final Integer complementIndex;
-        private final Integer brandIndex;
-        private final Integer productGroupIndex;
-        private final Integer departmentIndex;
-        private final Integer barcodeIndex;
-        private final Integer supplierNameIndex;
-        private final Integer packQuantityIndex;
-
-        private ProductColumnIndexes(
-                Integer codeIndex,
-                Integer descriptionIndex,
-                Integer complementIndex,
-                Integer brandIndex,
-                Integer productGroupIndex,
-                Integer departmentIndex,
-                Integer barcodeIndex,
-                Integer supplierNameIndex,
-                Integer packQuantityIndex
-        ) {
-            this.codeIndex = codeIndex;
-            this.descriptionIndex = descriptionIndex;
-            this.complementIndex = complementIndex;
-            this.brandIndex = brandIndex;
-            this.productGroupIndex = productGroupIndex;
-            this.departmentIndex = departmentIndex;
-            this.barcodeIndex = barcodeIndex;
-            this.supplierNameIndex = supplierNameIndex;
-            this.packQuantityIndex = packQuantityIndex;
-        }
+        return productRepository.findById(parsed.getCode())
+                .orElseGet(() -> productRepository.save(parsed));
     }
 }
