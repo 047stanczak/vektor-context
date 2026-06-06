@@ -13,7 +13,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +45,6 @@ public class ParserSeparatedProducts {
         try {
 
             List<SeparatedProduct> separatedProducts = new ArrayList<>();
-            Map<Integer, Product> productCache = new HashMap<>();
 
             try (CSVReader reader = csvHelper.buildReader(fileBytes)) {
 
@@ -59,14 +57,20 @@ public class ParserSeparatedProducts {
 
                 Map<String, Integer> headerIndex = csvHelper.buildHeaderIndex(header);
 
-                Integer operationIndex = csvHelper.headerIndex(headerIndex, "tp", "tipo", "operacao", "operação", "operation");
-                Integer transactionIndex = csvHelper.headerIndex(headerIndex, "transacao_bx", "transação_bx", "transaction_bx");
-                Integer storeCodeIndex = csvHelper.headerIndex(headerIndex, "orig", "origem", "loja_origem", "store_code");
-                Integer quantityIndex = csvHelper.headerIndex(headerIndex,"qtde_un");
-                Integer dateIndex = csvHelper.headerIndex(headerIndex, "baixa", "data_baixa", "data baixa", "baixa_data");
+                Integer operationIndex    = csvHelper.headerIndex(headerIndex, "tp", "tipo", "operacao", "operation");
+                Integer transactionIndex  = csvHelper.headerIndex(headerIndex, "transacao_bx", "transaction_bx");
+                Integer storeCodeIndex    = csvHelper.headerIndex(headerIndex, "orig", "origem", "loja_origem", "store_code");
+                Integer quantityIndex     = csvHelper.headerIndex(headerIndex, "qtde_un");
+                Integer dateIndex         = csvHelper.headerIndex(headerIndex, "baixa", "data_baixa", "baixa_data");
 
-                Integer productCodeIndex = csvHelper.headerIndex(headerIndex,"cod_prod");
-
+                Integer codeIndex         = csvHelper.headerIndex(headerIndex, "cod_prod");
+                Integer barcodeIndex      = csvHelper.headerIndex(headerIndex, "codigo_barras");
+                Integer descriptionIndex  = csvHelper.headerIndex(headerIndex, "descricao");
+                Integer complementIndex   = csvHelper.headerIndex(headerIndex, "complemento");
+                Integer brandIndex        = csvHelper.headerIndex(headerIndex, "marca");
+                Integer groupIndex        = csvHelper.headerIndex(headerIndex, "grupo");
+                Integer deptIndex         = csvHelper.headerIndex(headerIndex, "dpto");
+                Integer packQtyIndex      = csvHelper.headerIndex(headerIndex, "quant_emb");
 
                 if (transactionIndex == null) {
                     throw new RuntimeException("Coluna 'Transação Bx' não encontrada no arquivo.");
@@ -82,54 +86,44 @@ public class ParserSeparatedProducts {
 
                 while ((cols = reader.readNext()) != null) {
 
-                    if (csvHelper.isEmptyRow(cols)) {
-                        continue;
-                    }
+                    if (csvHelper.isEmptyRow(cols)) continue;
 
                     String transaction = csvHelper.col(cols, transactionIndex);
-                    if (transaction == null || transaction.isBlank()) {
-                        continue;
-                    }
+                    if (transaction == null || transaction.isBlank()) continue;
 
-                    Integer storeCode = csvHelper.parseQuantity(
-                        csvHelper.col(cols, storeCodeIndex)
-                    );
+                    String rawDate = csvHelper.col(cols, dateIndex);
+                    if (rawDate == null || rawDate.isBlank()) continue;
 
-                    SeparatedProduct sp = new SeparatedProduct();
+                    String codeValue = csvHelper.col(cols, codeIndex);
+                    if (codeValue == null) continue;
+
+                    Product product = new Product();
+                    product.setCode(Integer.parseInt(codeValue));
+                    product.setBarcode(csvHelper.col(cols, barcodeIndex));
+                    product.setDescription(csvHelper.col(cols, descriptionIndex));
+                    product.setComplement(csvHelper.col(cols, complementIndex));
+                    product.setBrand(csvHelper.col(cols, brandIndex));
+                    product.setProductGroup(csvHelper.col(cols, groupIndex));
+                    product.setDepartment(csvHelper.col(cols, deptIndex));
+                    product.setPackQuantity(csvHelper.parseQuantity(csvHelper.col(cols, packQtyIndex)));
+
+                    product = parserProduct.findOrCreateProduct(product);
 
                     if (!separationOperationRepository.existsById(transaction)) {
-
                         SeparationOperation op = new SeparationOperation();
-
                         op.setTransaction(transaction);
                         op.setOperation("MANUAL");
                         op.setUserName("manual");
-
                         separationOperationRepository.save(op);
                     }
 
-                    
-                    sp.setOperation(csvHelper.col(cols, idx(operationIndex, 3)));
-
+                    SeparatedProduct sp = new SeparatedProduct();
+                    sp.setOperation(csvHelper.col(cols, operationIndex));
                     sp.setTransaction(transaction);
-                    sp.setStoreCode(storeCode);
-
-                    String rawDate = csvHelper.col(cols, dateIndex);
-                    if (rawDate == null || rawDate.isBlank()) {
-                        continue;
-                    }
+                    sp.setStoreCode(csvHelper.parseQuantity(csvHelper.col(cols, storeCodeIndex)));
                     sp.setDate(csvHelper.parseDate(rawDate));
-
-                    Product product = parserProduct.findOrCreateProduct(cols, headerIndex, idx(productCodeIndex, 2), productCache);
-                    if (product == null) {
-                        continue;
-                    }
-
                     sp.setProductCode(product.getCode());
-                    sp.setProduct(product);
-
-
-                    sp.setQuantity(csvHelper.parseDouble(csvHelper.col(cols, idx(quantityIndex, 25))));
+                    sp.setQuantity(csvHelper.parseDouble(csvHelper.col(cols, quantityIndex)));
 
                     separatedProducts.add(sp);
                 }
@@ -141,9 +135,5 @@ public class ParserSeparatedProducts {
         } catch (Exception e) {
             importJobService.error(jobId, e.getMessage());
         }
-    }
-
-    private int idx(Integer index, int fallback) {
-        return index == null ? fallback : index;
     }
 }
