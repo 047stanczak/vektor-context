@@ -6,6 +6,8 @@ import com.vektorcontext.repository.ImportJobRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
 
 @Service
 public class ImportJobService {
@@ -45,5 +47,9 @@ public class ImportJobService {
     public ImportJob findById(Long jobId) {
         return importJobRepository.findById(jobId)
                 .orElseThrow(() -> new RuntimeException("Job não encontrado: " + jobId));
+    }
+
+    public List<ImportJob> findAll() {
+        return importJobRepository.findAll();
     }
 }
