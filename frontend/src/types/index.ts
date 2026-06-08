@@ -66,3 +66,15 @@ export interface ImportJob {
   startedAt: string
   finishedAt: string | null
 }
+
+export interface SeparationProduct {
+  id: number
+  separationOperationId: number
+  productCode: number
+  productDescription: string | null
+  quantity: number
+  quantityEmb: number | null
+  storeCode: number | null
+  status: string | null
+  createdAt: string
+}

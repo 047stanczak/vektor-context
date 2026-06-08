@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { loginApi } from './api'
 import { useAuth } from './AuthContext'
+import { BarChart2, Lock, User } from 'lucide-react'
 
 export default function LoginPage() {
   const [codeUser, setCodeUser] = useState('')
@@ -31,47 +32,85 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 w-full max-w-sm p-8">
-        <div className="mb-8 text-center">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-blue-600 mb-4">
-            <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-            </svg>
-          </div>
-          <h1 className="text-xl font-semibold text-gray-900">VektorContext</h1>
-          <p className="text-sm text-gray-500 mt-1">Sistema de divergências</p>
-        </div>
+    <div className="min-h-screen flex items-center justify-center p-4"
+      style={{ background: 'linear-gradient(135deg, #0f1117 0%, #1a1f2e 50%, #0f1117 100%)' }}>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Usuário</label>
-            <input
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              value={codeUser}
-              onChange={(e) => setCodeUser(e.target.value)}
-              placeholder="Código do usuário"
-              autoFocus
-            />
+      {/* Background glow */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(79,126,248,0.12) 0%, transparent 70%)' }} />
+      </div>
+
+      <div className="relative w-full max-w-sm fade-in">
+        {/* Card */}
+        <div className="rounded-2xl p-8"
+          style={{
+            background: 'rgba(255,255,255,0.04)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            backdropFilter: 'blur(20px)',
+          }}>
+
+          {/* Logo */}
+          <div className="flex flex-col items-center mb-8">
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4"
+              style={{ background: 'var(--accent)', boxShadow: '0 0 24px rgba(79,126,248,0.5)' }}>
+              <BarChart2 className="w-6 h-6 text-white" />
+            </div>
+            <h1 className="text-xl font-bold text-white">VektorContext</h1>
+            <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>Sistema de divergências</p>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Senha</label>
-            <input
-              type="password"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white rounded-lg py-2.5 text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors mt-2"
-          >
-            {loading ? 'Entrando...' : 'Entrar'}
-          </button>
-        </form>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5"
+                style={{ color: 'rgba(255,255,255,0.5)' }}>Usuário</label>
+              <div className="relative">
+                <User className="absolute left-3.5 top-2.5 w-4 h-4" style={{ color: 'rgba(255,255,255,0.3)' }} />
+                <input
+                  className="w-full rounded-xl px-3.5 py-2.5 pl-10 text-sm text-white placeholder:text-gray-600 focus:outline-none transition-all duration-150"
+                  style={{
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                  }}
+                  onFocus={(e) => (e.target.style.borderColor = 'rgba(79,126,248,0.6)')}
+                  onBlur={(e) => (e.target.style.borderColor = 'rgba(255,255,255,0.1)')}
+                  value={codeUser}
+                  onChange={(e) => setCodeUser(e.target.value)}
+                  placeholder="Código do usuário"
+                  autoFocus
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5"
+                style={{ color: 'rgba(255,255,255,0.5)' }}>Senha</label>
+              <div className="relative">
+                <Lock className="absolute left-3.5 top-2.5 w-4 h-4" style={{ color: 'rgba(255,255,255,0.3)' }} />
+                <input
+                  type="password"
+                  className="w-full rounded-xl px-3.5 py-2.5 pl-10 text-sm text-white placeholder:text-gray-600 focus:outline-none transition-all duration-150"
+                  style={{
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                  }}
+                  onFocus={(e) => (e.target.style.borderColor = 'rgba(79,126,248,0.6)')}
+                  onBlur={(e) => (e.target.style.borderColor = 'rgba(255,255,255,0.1)')}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                />
+              </div>
+            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-xl py-2.5 text-sm font-bold text-white transition-all duration-150 active:scale-[0.98] mt-2"
+              style={{ background: loading ? 'rgba(79,126,248,0.5)' : 'var(--accent)', boxShadow: '0 4px 20px rgba(79,126,248,0.35)' }}
+            >
+              {loading ? 'Entrando...' : 'Entrar'}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   )

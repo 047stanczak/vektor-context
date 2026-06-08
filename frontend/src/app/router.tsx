@@ -6,13 +6,15 @@ import DivergenceNewPage from '@/features/divergences/DivergenceNewPage'
 import DivergenceHistoryPage from '@/features/divergences/DivergenceHistoryPage'
 import DivergenceReportPage from '@/features/divergences/DivergenceReportPage'
 import UploadsPage from '@/features/uploads/UploadsPage'
+import JobsPage from '@/features/jobs/JobsPage'
+import OldPendingPage from '@/features/old-pending/OldPendingPage'
 
 function ProtectedLayout() {
   const { isAuthenticated, isChecking } = useAuth()
 
   if (isChecking) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#f5f6fa' }}>
+      <div className="w-7 h-7 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: 'var(--accent)', borderTopColor: 'transparent' }} />
     </div>
   )
 
@@ -33,6 +35,8 @@ const router = createBrowserRouter(
         { path: 'divergences/history', element: <DivergenceHistoryPage /> },
         { path: 'divergences/report',  element: <DivergenceReportPage /> },
         { path: 'uploads',             element: <UploadsPage /> },
+        { path: 'jobs',                element: <JobsPage /> },
+        { path: 'old-pending',         element: <OldPendingPage /> },
       ],
     },
     { path: '*', element: <Navigate to="/vektor" replace /> },

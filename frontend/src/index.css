@@ -1,19 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --sidebar-bg: #0f1117;
+  --sidebar-border: rgba(255,255,255,0.06);
+  --accent: #4f7ef8;
+  --accent-hover: #3b6ef0;
+  --accent-subtle: rgba(79,126,248,0.1);
+  --accent-subtle-hover: rgba(79,126,248,0.18);
+}
+
 @layer base {
-  * { @apply border-border; }
-  body { @apply bg-background text-foreground; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    background: #f5f6fa;
+    color: #1a1d27;
+  }
 }
 
 @layer components {
   .label {
-    @apply block text-sm font-medium text-gray-700 mb-1;
+    @apply block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5;
   }
   .field {
-    @apply w-full border border-gray-300 rounded-lg px-3 py-2 text-sm
-           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-           disabled:opacity-50 disabled:bg-gray-50;
+    @apply w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm bg-white
+           focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400
+           disabled:opacity-50 disabled:bg-gray-50 transition-all duration-150
+           placeholder:text-gray-300;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .card {
+    @apply bg-white rounded-2xl border border-gray-100 shadow-sm;
+  }
+  .btn-primary {
+    @apply flex items-center justify-center gap-2 bg-blue-600 text-white rounded-xl
+           px-4 py-2.5 text-sm font-semibold hover:bg-blue-700 disabled:opacity-40
+           transition-all duration-150 active:scale-[0.98];
+  }
+  .btn-secondary {
+    @apply flex items-center justify-center gap-2 bg-gray-100 text-gray-700 rounded-xl
+           px-4 py-2.5 text-sm font-semibold hover:bg-gray-200 disabled:opacity-40
+           transition-all duration-150 active:scale-[0.98];
+  }
+  .btn-danger {
+    @apply flex items-center justify-center gap-2 bg-red-500 text-white rounded-xl
+           px-4 py-2.5 text-sm font-semibold hover:bg-red-600 disabled:opacity-40
+           transition-all duration-150 active:scale-[0.98];
+  }
+}
+
+@layer utilities {
+  .mono { font-family: 'DM Mono', monospace; }
+  .fade-in {
+    animation: fadeIn 0.3s ease forwards;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 }
