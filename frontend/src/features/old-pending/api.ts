@@ -10,3 +10,8 @@ export async function fetchOldPendingWithStock(): Promise<SeparationProduct[]> {
   const res = await api.get<SeparationProduct[]>('/old-pending-with-stock')
   return res.data
 }
+
+export async function fetchOldPendingNoStock(): Promise<SeparationProduct[]> {
+  const res = await api.get<SeparationProduct[]>('/old-pending-no-stock')
+  return res.data
+}

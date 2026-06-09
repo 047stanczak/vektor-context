@@ -37,4 +37,15 @@ public class SeparationProductController {
             )
         );
     }
+
+    @GetMapping("/old-pending-no-stock")
+    public ResponseEntity<List<SeparationProduct>> oldPendingNoStock() {
+        return ResponseEntity.ok(
+            repository.findOldPendingNoStock(
+                LocalDate.now(),
+                LocalDate.now().minusDays(15),
+                LocalDate.now().atStartOfDay()
+            )
+        );
+    }
 }
