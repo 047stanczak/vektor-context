@@ -49,7 +49,7 @@ public class ImportJobService {
                 .orElseThrow(() -> new RuntimeException("Job não encontrado: " + jobId));
     }
 
-    public List<ImportJob> findAll() {
-        return importJobRepository.findAll();
+    public List<ImportJob> findAllByOrderByIdDesc() {
+        return importJobRepository.findAllByOrderByIdDesc();
     }
 }

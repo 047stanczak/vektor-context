@@ -23,7 +23,7 @@ public class JobController {
     
     @GetMapping("/status")
         public ResponseEntity<List<ImportJob>> all() {
-            return ResponseEntity.ok(importJobService.findAll());
+            return ResponseEntity.ok(importJobService.findAllByOrderByIdDesc());
         }
     
     @GetMapping("/status/{jobId}")
