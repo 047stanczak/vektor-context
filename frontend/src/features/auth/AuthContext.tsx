@@ -22,16 +22,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     api.get('/separation-operations/separators')
       .then(() => setIsAuthenticated(true))
-      .catch((err) => {
-        if (err.response?.status === 401) setIsAuthenticated(false)
-        else setIsAuthenticated(false)
-      })
+      .catch(() => setIsAuthenticated(false))
       .finally(() => setIsChecking(false))
   }, [])
 
   const login = () => setIsAuthenticated(true)
-  const logout = () => {
-    api.post('/logout').catch(() => {})
+
+  const logout = async () => {
+    try {
+      await api.post('/logout')
+    } catch {}
     setIsAuthenticated(false)
     window.location.href = '/vektor/login'
   }
