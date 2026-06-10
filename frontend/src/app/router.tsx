@@ -8,6 +8,7 @@ import DivergenceReportPage from '@/features/divergences/DivergenceReportPage'
 import UploadsPage from '@/features/uploads/UploadsPage'
 import JobsPage from '@/features/jobs/JobsPage'
 import OldPendingPage from '@/features/old-pending/OldPendingPage'
+import RankingsPage from '@/features/rankings/RankingsPage'
 
 function ProtectedLayout() {
   const { isAuthenticated, isChecking } = useAuth()
@@ -37,6 +38,7 @@ const router = createBrowserRouter(
         { path: 'uploads',             element: <UploadsPage /> },
         { path: 'jobs',                element: <JobsPage /> },
         { path: 'old-pending',         element: <OldPendingPage /> },
+        { path: 'rankings',            element: <RankingsPage /> },
       ],
     },
     { path: '*', element: <Navigate to="/vektor" replace /> },

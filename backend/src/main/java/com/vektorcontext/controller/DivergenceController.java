@@ -2,8 +2,10 @@ package com.vektorcontext.controller;
 
 import com.vektorcontext.api.ApiResponse;
 import com.vektorcontext.dto.DivergenceQueryResponse;
+import com.vektorcontext.dto.DivergenceRankingItem;
 import com.vektorcontext.dto.DivergenceRecordRequest;
 import com.vektorcontext.dto.DivergenceRecordResponse;
+import com.vektorcontext.repository.DivergenceRecordRepository;
 import com.vektorcontext.services.DivergenceService;
 import com.vektorcontext.services.PdfReportService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -21,11 +23,14 @@ public class DivergenceController {
 
     private final DivergenceService divergenceService;
     private final PdfReportService pdfReportService;
+    private final DivergenceRecordRepository divergenceRecordRepository;
 
     public DivergenceController(DivergenceService divergenceService,
-                                PdfReportService pdfReportService) {
+                                PdfReportService pdfReportService,
+                            DivergenceRecordRepository divergenceRecordRepository) {
         this.divergenceService = divergenceService;
         this.pdfReportService = pdfReportService;
+        this.divergenceRecordRepository = divergenceRecordRepository;
     }
 
 
@@ -118,4 +123,21 @@ public class DivergenceController {
                     .body(ApiResponse.error(404, e.getMessage()));
         }
     }
+
+    @GetMapping("/ranking/separator")
+    public ResponseEntity<List<DivergenceRankingItem>> rankBySeparator(
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
+    ) {
+        return ResponseEntity.ok(divergenceRecordRepository.rankBySeparator(from, to));
+    }
+
+    @GetMapping("/ranking/product")
+    public ResponseEntity<List<DivergenceRankingItem>> rankByProduct(
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
+    ) {
+        return ResponseEntity.ok(divergenceRecordRepository.rankByProduct(from, to));
+    }
+
 }

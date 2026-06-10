@@ -1,9 +1,9 @@
 import { useState, ReactNode } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import { useAuth } from '@/features/auth/AuthContext'
 import {
   AlertTriangle, History, FileText, Upload, LogOut,
-  Menu, X, BarChart2, Clock, Package
+  Menu, X, BarChart2, Clock, Package, TrendingUp
 } from 'lucide-react'
 
 const nav = [
@@ -13,16 +13,16 @@ const nav = [
   { to: '/vektor/uploads',             label: 'Importar',     icon: Upload,        group: 'Sistema' },
   { to: '/vektor/jobs',                label: 'Jobs',         icon: Clock,         group: 'Sistema' },
   { to: '/vektor/old-pending',         label: 'Pendências',   icon: Package,       group: 'Sistema' },
+  { to: '/vektor/rankings',            label: 'Rankings',     icon: TrendingUp,    group: 'Análise' },
 ]
 
-const groups = ['Divergências', 'Sistema']
+const groups = ['Divergências', 'Sistema', 'Análise']
 
 function SidebarContent({ onClose }: { onClose?: () => void }) {
   const { logout } = useAuth()
 
   return (
     <div className="flex flex-col h-full" style={{ background: 'var(--sidebar-bg)' }}>
-      {/* Logo */}
       <div className="flex items-center gap-3 px-5 py-5" style={{ borderBottom: '1px solid var(--sidebar-border)' }}>
         <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
           style={{ background: 'var(--accent)', boxShadow: '0 0 16px rgba(79,126,248,0.4)' }}>
@@ -36,7 +36,6 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
         )}
       </div>
 
-      {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-5 overflow-y-auto">
         {groups.map((group) => (
           <div key={group}>
@@ -51,9 +50,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
                   onClick={onClose}
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
-                      isActive
-                        ? 'text-white'
-                        : 'hover:text-white'
+                      isActive ? 'text-white' : 'hover:text-white'
                     }`
                   }
                   style={({ isActive }) => isActive
@@ -70,7 +67,6 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
         ))}
       </nav>
 
-      {/* Footer */}
       <div className="px-3 py-4" style={{ borderTop: '1px solid var(--sidebar-border)' }}>
         <button
           onClick={logout}
@@ -92,12 +88,10 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex h-screen" style={{ background: '#f5f6fa' }}>
-      {/* Desktop sidebar */}
       <aside className="hidden lg:flex flex-col w-56 flex-shrink-0" style={{ background: 'var(--sidebar-bg)' }}>
         <SidebarContent />
       </aside>
 
-      {/* Mobile overlay */}
       {mobileOpen && (
         <div className="lg:hidden fixed inset-0 z-40 flex">
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
@@ -107,9 +101,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
         </div>
       )}
 
-      {/* Main */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Mobile topbar */}
         <header className="lg:hidden flex items-center gap-3 px-4 py-3 bg-white border-b border-gray-100">
           <button onClick={() => setMobileOpen(true)} className="text-gray-500 hover:text-gray-900 transition-colors">
             <Menu className="w-5 h-5" />
