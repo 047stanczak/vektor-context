@@ -6,6 +6,8 @@ import { Package, PackageX, Loader2, RefreshCw, LayoutList, Layers, Copy, Check 
 
 type Mode = 'all' | 'with-stock' | 'no-stock'
 
+const DAY_OPTIONS = [5, 7, 10, 15, 20, 30]
+
 function buildMessage(items: SeparationProduct[]): string {
   const byStore: Record<string, SeparationProduct[]> = {}
   for (const item of items) {
@@ -13,7 +15,6 @@ function buildMessage(items: SeparationProduct[]): string {
     if (!byStore[key]) byStore[key] = []
     byStore[key].push(item)
   }
-
   const lines = ['📦 Produtos com pedido de separação mas sem estoque no sistema\n']
   for (const [store, products] of Object.entries(byStore).sort()) {
     lines.push(`Loja ${store}`)
@@ -26,19 +27,20 @@ function buildMessage(items: SeparationProduct[]): string {
   return lines.join('\n').trim()
 }
 
-function queryFnFor(mode: Mode) {
-  if (mode === 'with-stock') return fetchOldPendingWithStock
-  if (mode === 'no-stock')   return fetchOldPendingNoStock
-  return fetchOldPending
+function queryFnFor(mode: Mode, days: number) {
+  if (mode === 'with-stock') return () => fetchOldPendingWithStock(days)
+  if (mode === 'no-stock')   return () => fetchOldPendingNoStock(days)
+  return () => fetchOldPending(days)
 }
 
 export default function OldPendingPage() {
   const [mode, setMode] = useState<Mode>('all')
+  const [days, setDays] = useState(15)
   const [copied, setCopied] = useState(false)
 
   const { data: items = [], isLoading, refetch, isFetching } = useQuery({
-    queryKey: ['old-pending', mode],
-    queryFn: queryFnFor(mode),
+    queryKey: ['old-pending', mode, days],
+    queryFn: queryFnFor(mode, days),
   })
 
   function handleCopy() {
@@ -77,35 +79,58 @@ export default function OldPendingPage() {
         </div>
       </div>
 
-      {/* Mode toggle */}
-      <div className="flex gap-2 flex-wrap">
-        <button
-          onClick={() => setMode('all')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border transition-all duration-150 ${
-            mode === 'all' ? 'text-white border-transparent' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
-          }`}
-          style={mode === 'all' ? { background: 'var(--accent)' } : {}}
-        >
-          <LayoutList className="w-3.5 h-3.5" /> Todos pendentes
-        </button>
-        <button
-          onClick={() => setMode('with-stock')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border transition-all duration-150 ${
-            mode === 'with-stock' ? 'text-white border-transparent' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
-          }`}
-          style={mode === 'with-stock' ? { background: 'var(--accent)' } : {}}
-        >
-          <Layers className="w-3.5 h-3.5" /> Com estoque
-        </button>
-        <button
-          onClick={() => setMode('no-stock')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border transition-all duration-150 ${
-            mode === 'no-stock' ? 'text-white border-transparent' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
-          }`}
-          style={mode === 'no-stock' ? { background: 'var(--accent)' } : {}}
-        >
-          <PackageX className="w-3.5 h-3.5" /> Sem estoque
-        </button>
+      {/* Filtros */}
+      <div className="flex flex-wrap items-center gap-3">
+        {/* Mode toggle */}
+        <div className="flex gap-2 flex-wrap">
+          <button
+            onClick={() => setMode('all')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border transition-all duration-150 ${
+              mode === 'all' ? 'text-white border-transparent' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
+            }`}
+            style={mode === 'all' ? { background: 'var(--accent)' } : {}}
+          >
+            <LayoutList className="w-3.5 h-3.5" /> Todos pendentes
+          </button>
+          <button
+            onClick={() => setMode('with-stock')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border transition-all duration-150 ${
+              mode === 'with-stock' ? 'text-white border-transparent' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
+            }`}
+            style={mode === 'with-stock' ? { background: 'var(--accent)' } : {}}
+          >
+            <Layers className="w-3.5 h-3.5" /> Com estoque
+          </button>
+          <button
+            onClick={() => setMode('no-stock')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border transition-all duration-150 ${
+              mode === 'no-stock' ? 'text-white border-transparent' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
+            }`}
+            style={mode === 'no-stock' ? { background: 'var(--accent)' } : {}}
+          >
+            <PackageX className="w-3.5 h-3.5" /> Sem estoque
+          </button>
+        </div>
+
+        {/* Days selector */}
+        <div className="flex items-center gap-2 ml-auto">
+          <span className="text-xs text-gray-400 font-medium">Pendente há mais de</span>
+          <div className="flex gap-1">
+            {DAY_OPTIONS.map((d) => (
+              <button
+                key={d}
+                onClick={() => setDays(d)}
+                className="px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all duration-150"
+                style={days === d
+                  ? { background: 'var(--accent)', color: 'white', borderColor: 'transparent' }
+                  : { background: 'white', color: '#6b7280', borderColor: '#e5e7eb' }
+                }
+              >
+                {d}d
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       <div className="card overflow-hidden">
@@ -120,7 +145,6 @@ export default function OldPendingPage() {
           </div>
         ) : (
           <>
-            {/* Desktop */}
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -143,7 +167,6 @@ export default function OldPendingPage() {
               </table>
             </div>
 
-            {/* Mobile */}
             <div className="md:hidden divide-y divide-gray-50">
               {items.map((item) => (
                 <div key={item.id} className="p-4 space-y-1">

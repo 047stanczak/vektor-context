@@ -1,10 +1,11 @@
 package com.vektorcontext.controller;
 
-import com.vektorcontext.models.SeparationProduct;
+import com.vektorcontext.dto.SeparationProductDTO;
 import com.vektorcontext.repository.SeparationProductRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
@@ -21,31 +22,38 @@ public class SeparationProductController {
     }
 
     @GetMapping("/old-pending")
-    public ResponseEntity<List<SeparationProduct>> oldPending() {
+    public ResponseEntity<List<SeparationProductDTO>> oldPending(
+        @RequestParam(defaultValue = "15") int days
+    ) {
         return ResponseEntity.ok(
-            repository.findOldPending(LocalDate.now(), LocalDate.now().minusDays(15))
+            repository.findOldPending(LocalDate.now(), LocalDate.now().minusDays(days))
+                .stream().map(SeparationProductDTO::from).toList()
         );
     }
 
     @GetMapping("/old-pending-with-stock")
-    public ResponseEntity<List<SeparationProduct>> oldPendingWithStock() {
+    public ResponseEntity<List<SeparationProductDTO>> oldPendingWithStock(
+        @RequestParam(defaultValue = "15") int days
+    ) {
         return ResponseEntity.ok(
             repository.findOldPendingWithStock(
                 LocalDate.now(),
-                LocalDate.now().minusDays(15),
+                LocalDate.now().minusDays(days),
                 LocalDate.now().atStartOfDay()
-            )
+            ).stream().map(SeparationProductDTO::from).toList()
         );
     }
 
     @GetMapping("/old-pending-no-stock")
-    public ResponseEntity<List<SeparationProduct>> oldPendingNoStock() {
+    public ResponseEntity<List<SeparationProductDTO>> oldPendingNoStock(
+        @RequestParam(defaultValue = "15") int days
+    ) {
         return ResponseEntity.ok(
             repository.findOldPendingNoStock(
                 LocalDate.now(),
-                LocalDate.now().minusDays(15),
+                LocalDate.now().minusDays(days),
                 LocalDate.now().atStartOfDay()
-            )
+            ).stream().map(SeparationProductDTO::from).toList()
         );
     }
 }

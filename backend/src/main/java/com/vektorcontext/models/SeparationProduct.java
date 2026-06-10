@@ -3,8 +3,6 @@ package com.vektorcontext.models;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 @Entity
 @Table(name = "separation_product")
 public class SeparationProduct {
@@ -28,7 +26,6 @@ public class SeparationProduct {
     @Column(name = "product_code")
     private Integer productCode;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_code", referencedColumnName = "code", nullable = false, insertable = false, updatable = false)
     private Product product;
