@@ -8,6 +8,8 @@ import com.vektorcontext.security.TokenSecurity;
 import com.vektorcontext.services.AuthService;
 
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +29,7 @@ public class AuthController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<Void>> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<ApiResponse<Void>> register(@RequestBody @Valid RegisterRequest request) {
         User user = authService.register(request);
 
         if (user == null) {
@@ -40,7 +42,7 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<Void>> login(@RequestBody LoginRequest request,HttpServletResponse response) {
+    public ResponseEntity<ApiResponse<Void>> login(@RequestBody @Valid LoginRequest request,HttpServletResponse response) {
         User user = authService.authenticate(request);
 
         if (user == null) {

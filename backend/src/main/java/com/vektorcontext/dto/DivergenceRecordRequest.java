@@ -2,14 +2,23 @@ package com.vektorcontext.dto;
 
 import java.time.LocalDate;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public class DivergenceRecordRequest {
 
+    @NotNull
     private LocalDate date;
+    @NotNull
     private Integer storeCode;
+    @NotNull
     private Integer productCode;
+    @NotBlank
     private String tipo;
+    @NotNull
     private Double quantity;
     private Double currentStock;
+    @NotBlank
     private String separatorName;
     private String nf;
     private String observation;

@@ -1,8 +1,13 @@
 package com.vektorcontext.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class RegisterRequest {
 
+    @NotBlank
     private String codeUser;
+
+    @NotBlank
     private String password;
 
     public String getCodeUser() {

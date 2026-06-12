@@ -8,6 +8,9 @@ import com.vektorcontext.dto.DivergenceRecordResponse;
 import com.vektorcontext.repository.DivergenceRecordRepository;
 import com.vektorcontext.services.DivergenceService;
 import com.vektorcontext.services.PdfReportService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -61,7 +64,7 @@ public class DivergenceController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<List<DivergenceRecordResponse>>> saveAll(
-            @RequestBody List<DivergenceRecordRequest> requests
+            @RequestBody @Valid List<DivergenceRecordRequest> requests
     ) {
         List<DivergenceRecordResponse> saved = divergenceService.saveAll(requests);
         return ResponseEntity.ok(ApiResponse.ok("Divergências salvas", saved));
@@ -101,7 +104,7 @@ public class DivergenceController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<DivergenceRecordResponse>> update(
             @PathVariable Long id,
-            @RequestBody DivergenceRecordRequest request
+            @RequestBody @Valid DivergenceRecordRequest request
     ) {
         try {
             DivergenceRecordResponse updated = divergenceService.update(id, request);
