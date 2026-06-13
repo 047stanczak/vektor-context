@@ -19,7 +19,7 @@ Sistema web para gestão de divergências em operações de separação de estoq
 
 ```bash
 # 1. Clone o repositório
-git clone https://github.com/seu-usuario/vektor-context.git
+git clone https://github.com/047stanczak/vektor-context.git
 cd vektor-context
 
 # 2. Configure as variáveis de ambiente
