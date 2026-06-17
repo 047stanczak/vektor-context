@@ -9,11 +9,6 @@ import com.vektorcontext.api.ApiResponse;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(EmailAlreadyExistsException.class)
-    public ResponseEntity<ApiResponse<Object>> handleEmailExists(EmailAlreadyExistsException ex) {
-        return ResponseEntity.status(400).body(ApiResponse.error(400, ex.getMessage()));
-    }
-
     @ExceptionHandler(InvalidCredentialsException.class)
     public ResponseEntity<ApiResponse<Object>> handleInvalidCredentials(InvalidCredentialsException ex) {
         return ResponseEntity.status(401).body(ApiResponse.error(401, ex.getMessage()));
@@ -39,5 +34,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(500)
                 .body(ApiResponse.error(500, "Erro interno"));
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ApiResponse<Object>> handleUserAlreadyExists(UserAlreadyExistsException ex) {
+        return ResponseEntity.status(409).body(ApiResponse.error(409, ex.getMessage()));
     }
 }

@@ -48,17 +48,11 @@ public class DivergenceController {
                     .body(ApiResponse.error(400, "Informe productCode ou barcode"));
         }
 
-        try {
-            DivergenceQueryResponse data = productCode != null
-                    ? divergenceService.queryByProductCode(productCode, storeCode)
-                    : divergenceService.queryByBarcode(barcode, storeCode);
+        DivergenceQueryResponse data = productCode != null
+           ? divergenceService.queryByProductCode(productCode, storeCode)
+           : divergenceService.queryByBarcode(barcode, storeCode);
 
-            return ResponseEntity.ok(ApiResponse.ok("Produto encontrado", data));
-
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(404)
-                    .body(ApiResponse.error(404, e.getMessage()));
-        }
+        return ResponseEntity.ok(ApiResponse.ok("Produto encontrado", data));
     }
 
 
@@ -84,20 +78,14 @@ public class DivergenceController {
     public ResponseEntity<byte[]> reportPdf(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
-        try {
-            List<DivergenceRecordResponse> records = divergenceService.findByDateForReport(date);
-            byte[] pdf = pdfReportService.generate(date, records);
+        List<DivergenceRecordResponse> records = divergenceService.findByDateForReport(date);
+        byte[] pdf = pdfReportService.generate(date, records);
 
-            String filename = "divergencias-" + date + ".pdf";
-
-            return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_PDF)
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"")
-                    .body(pdf);
-
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(404).build();
-        }
+        String filename = "divergencias-" + date + ".pdf";
+        return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_PDF)
+            .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"")
+            .body(pdf);
     }
 
 
@@ -106,25 +94,15 @@ public class DivergenceController {
             @PathVariable Long id,
             @RequestBody @Valid DivergenceRecordRequest request
     ) {
-        try {
-            DivergenceRecordResponse updated = divergenceService.update(id, request);
-            return ResponseEntity.ok(ApiResponse.ok("Divergência atualizada", updated));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(404)
-                    .body(ApiResponse.error(404, e.getMessage()));
-        }
+        DivergenceRecordResponse updated = divergenceService.update(id, request);
+        return ResponseEntity.ok(ApiResponse.ok("Divergência atualizada", updated));
     }
 
     
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
-        try {
-            divergenceService.delete(id);
-            return ResponseEntity.ok(ApiResponse.ok("Divergência excluída"));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(404)
-                    .body(ApiResponse.error(404, e.getMessage()));
-        }
+        divergenceService.delete(id);
+        return ResponseEntity.ok(ApiResponse.ok("Divergência excluída"));
     }
 
     @GetMapping("/ranking/separator")

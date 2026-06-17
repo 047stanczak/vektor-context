@@ -3,6 +3,8 @@ package com.vektorcontext.controller;
 import com.vektorcontext.api.ApiResponse;
 import com.vektorcontext.dto.LoginRequest;
 import com.vektorcontext.dto.RegisterRequest;
+import com.vektorcontext.exception.InvalidCredentialsException;
+import com.vektorcontext.exception.UserAlreadyExistsException;
 import com.vektorcontext.models.User;
 import com.vektorcontext.security.TokenSecurity;
 import com.vektorcontext.services.AuthService;
@@ -33,8 +35,7 @@ public class AuthController {
         User user = authService.register(request);
 
         if (user == null) {
-            return ResponseEntity.badRequest()
-                    .body(ApiResponse.error(400, "Usuário já existe"));
+            throw new UserAlreadyExistsException("Usuário já existe");
         }
 
         return ResponseEntity.ok(ApiResponse.ok("Usuário criado com sucesso"));
@@ -46,8 +47,7 @@ public class AuthController {
         User user = authService.authenticate(request);
 
         if (user == null) {
-            return ResponseEntity.status(401)
-                    .body(ApiResponse.error(401, "Usuário ou senha inválidos"));
+            throw new InvalidCredentialsException("Usuário ou senha inválidos");
         }
 
         String token = tokenSecurity.generateToken(user);

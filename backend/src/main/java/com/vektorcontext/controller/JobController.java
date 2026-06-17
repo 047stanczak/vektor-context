@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.vektorcontext.exception.JobNotFoundException;
 import com.vektorcontext.models.ImportJob;
 import com.vektorcontext.services.ImportJobService;
 
@@ -30,7 +31,7 @@ public class JobController {
     public ResponseEntity<ImportJob> status(@PathVariable Long jobId) {
         ImportJob job = importJobService.findById(jobId);
         if (job == null) {
-            return ResponseEntity.notFound().build();
+            throw new JobNotFoundException("Job não encontrado: " + jobId);
         }
         return ResponseEntity.ok(job);
     }

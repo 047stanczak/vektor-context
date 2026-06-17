@@ -3,6 +3,8 @@ package com.vektorcontext.services;
 import com.vektorcontext.dto.DivergenceQueryResponse;
 import com.vektorcontext.dto.DivergenceRecordRequest;
 import com.vektorcontext.dto.DivergenceRecordResponse;
+import com.vektorcontext.exception.DivergenceNotFoundException;
+import com.vektorcontext.exception.ProductNotFoundException;
 import com.vektorcontext.models.DivergenceRecord;
 import com.vektorcontext.models.Product;
 import com.vektorcontext.repository.DivergenceRecordRepository;
@@ -36,13 +38,13 @@ public class DivergenceService {
 
     public DivergenceQueryResponse queryByProductCode(Integer productCode, Integer storeCode) {
         Product product = productRepository.findById(productCode)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado: " + productCode));
+                .orElseThrow(() -> new ProductNotFoundException("Produto não encontrado: " + productCode));
         return buildQueryResponse(product, storeCode);
     }
 
     public DivergenceQueryResponse queryByBarcode(String barcode, Integer storeCode) {
         Product product = productRepository.findByBarcode(barcode)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado pelo barcode: " + barcode));
+                .orElseThrow(() -> new ProductNotFoundException("Produto não encontrado pelo barcode: " + barcode));
         return buildQueryResponse(product, storeCode);
     }
 
@@ -62,7 +64,7 @@ public class DivergenceService {
 
     public DivergenceRecord findById(Long id) {
         return divergenceRecordRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Divergência não encontrada: " + id));
+                .orElseThrow(() -> new DivergenceNotFoundException("Divergência não encontrada: " + id));
     }
 
     public DivergenceRecordResponse update(Long id, DivergenceRecordRequest request) {
@@ -87,16 +89,14 @@ public class DivergenceService {
         divergenceRecordRepository.deleteById(id);
     }
 
-    // Retorna lista enriquecida para o PDF — mesma lógica do findByDate mas exposta separadamente.
     public List<DivergenceRecordResponse> findByDateForReport(LocalDate date) {
         List<DivergenceRecord> records = divergenceRecordRepository.findByDate(date);
         if (records.isEmpty()) {
-            throw new RuntimeException("Nenhuma divergência encontrada para " + date);
+            throw new DivergenceNotFoundException("Nenhuma divergência encontrada para " + date);
         }
         return enrichWithStockSnapshot(records, date);
     }
 
-    // ── helpers ──────────────────────────────────────────────────────────────
 
     private DivergenceQueryResponse buildQueryResponse(Product product, Integer storeCode) {
         String separatorName = transactionFinder.findSeparatorName(product.getCode(), storeCode);
