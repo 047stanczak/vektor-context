@@ -1,8 +1,9 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { fetchOldPending, fetchOldPendingWithStock, fetchOldPendingNoStock } from './api'
 import { SeparationProduct } from '@/types'
-import { Package, PackageX, Loader2, RefreshCw, LayoutList, Layers, Copy, Check } from 'lucide-react'
+import { Package, PackageX, Loader2, RefreshCw, LayoutList, Layers, Copy, Check, ClipboardList } from 'lucide-react'
 
 type Mode = 'all' | 'with-stock' | 'no-stock'
 
@@ -34,6 +35,7 @@ function queryFnFor(mode: Mode, days: number) {
 }
 
 export default function OldPendingPage() {
+  const navigate = useNavigate()
   const [mode, setMode] = useState<Mode>('all')
   const [days, setDays] = useState(15)
   const [copied, setCopied] = useState(false)
@@ -149,7 +151,7 @@ export default function OldPendingPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-gray-100">
-                    {['Produto', 'Descrição', 'Loja', 'Qtde'].map((h) => (
+                    {['Produto', 'Descrição', 'Complemento', 'Loja', 'Qtde', ''].map((h) => (
                       <th key={h} className="px-5 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">{h}</th>
                     ))}
                   </tr>
@@ -158,9 +160,15 @@ export default function OldPendingPage() {
                   {items.map((item) => (
                     <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-5 py-3 mono text-xs font-medium text-gray-800">{item.productCode}</td>
-                      <td className="px-5 py-3 text-gray-600 max-w-[260px] truncate text-xs">{item.productDescription ?? '—'}</td>
-                      <td className="px-5 py-3 text-gray-600 text-xs">{item.storeCode ?? '—'}</td>
+                        <td className="px-5 py-3 text-gray-600 max-w-[260px] truncate text-xs">{item.productDescription ?? '—'}</td>
+                        <td className="px-5 py-3 text-gray-500 text-xs max-w-[160px] truncate">{item.productComplement ?? '—'}</td>
+                        <td className="px-5 py-3 text-gray-600 text-xs">{item.storeCode ?? '—'}</td>
                       <td className="px-5 py-3 text-gray-700 text-xs">{item.quantity}</td>
+                      <td className="px-5 py-3">
+                        <button onClick={() => navigate(`/vektor/counting?productCode=${item.productCode}`)} title="Ver contagem">
+                          <ClipboardList className="w-3.5 h-3.5 text-gray-400 hover:text-gray-700" />
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -175,7 +183,13 @@ export default function OldPendingPage() {
                     <span className="text-xs text-gray-400">Loja {item.storeCode ?? '—'}</span>
                   </div>
                   {item.productDescription && <p className="text-xs text-gray-500 truncate">{item.productDescription}</p>}
-                  <p className="text-xs text-gray-400">Qtde: {item.quantity}</p>
+                  {item.productComplement && <p className="text-xs text-gray-400 truncate">{item.productComplement}</p>}
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-gray-400">Qtde: {item.quantity}</p>
+                    <button onClick={() => navigate(`/vektor/counting?productCode=${item.productCode}`)}>
+                      <ClipboardList className="w-3.5 h-3.5 text-gray-400" />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

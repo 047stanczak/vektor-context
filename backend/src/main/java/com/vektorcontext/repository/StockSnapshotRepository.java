@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 public interface StockSnapshotRepository extends JpaRepository<StockSnapshot, Long> {
@@ -13,10 +14,23 @@ public interface StockSnapshotRepository extends JpaRepository<StockSnapshot, Lo
     Optional<StockSnapshot> findTopByProductCodeOrderByCapturedAtDesc(Integer productCode);
 
     @Query("SELECT s FROM StockSnapshot s " +
-           "WHERE s.productCode = :productCode " +
-           "AND CAST(s.capturedAt AS DATE) = :date " +
-           "ORDER BY s.capturedAt DESC " +
-           "LIMIT 1")
+        "WHERE s.productCode = :productCode " +
+        "AND CAST(s.capturedAt AS DATE) = :date " +
+        "ORDER BY s.capturedAt DESC " +
+        "LIMIT 1")
     Optional<StockSnapshot> findByProductCodeAndDate(@Param("productCode") Integer productCode, 
                                                      @Param("date") LocalDate date);
+
+    @Query("SELECT DISTINCT s.product.brand FROM StockSnapshot s WHERE CAST(s.capturedAt AS DATE) = :today AND s.currentStock > 0 AND s.product.brand IS NOT NULL ORDER BY s.product.brand")
+    List<String> findDistinctBrandsToday(@Param("today") LocalDate today);
+
+    @Query("SELECT s FROM StockSnapshot s WHERE s.product.brand = :brand AND CAST(s.capturedAt AS DATE) = :today AND s.currentStock > 0")
+    List<StockSnapshot> findByBrandToday(@Param("brand") String brand, @Param("today") LocalDate today);
+
+    @Query("SELECT DISTINCT s.product.department FROM StockSnapshot s WHERE CAST(s.capturedAt AS DATE) = :today AND s.currentStock > 0 AND s.product.department IS NOT NULL ORDER BY s.product.department")
+    List<String> findDistinctDepartmentsToday(@Param("today") LocalDate today);
+
+    @Query("SELECT s FROM StockSnapshot s WHERE s.product.department = :department AND CAST(s.capturedAt AS DATE) = :today AND s.currentStock > 0")
+    List<StockSnapshot> findByDepartmentToday(@Param("department") String department, @Param("today") LocalDate today);
+
 }

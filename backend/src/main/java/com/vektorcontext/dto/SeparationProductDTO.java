@@ -9,6 +9,7 @@ public class SeparationProductDTO {
     private String productDescription;
     private String storeCode;
     private Double quantity;
+    private String productComplement;
 
     public static SeparationProductDTO from(SeparationProduct s) {
         SeparationProductDTO dto = new SeparationProductDTO();
@@ -17,6 +18,7 @@ public class SeparationProductDTO {
         dto.productDescription = s.getProduct() != null ? s.getProduct().getDescription() : null;
         dto.storeCode = s.getStoreCode();
         dto.quantity = s.getQuantity();
+        dto.productComplement = s.getProduct() != null ? s.getProduct().getComplement() : null;
         return dto;
     }
 
@@ -34,4 +36,7 @@ public class SeparationProductDTO {
 
     public Double getQuantity() { return quantity; }
     public void setQuantity(Double quantity) { this.quantity = quantity; }
+
+    public String getProductComplement() { return productComplement; }
+    public void setProductComplement(String productComplement) { this.productComplement = productComplement; }
 }

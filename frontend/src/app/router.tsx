@@ -10,6 +10,7 @@ import JobsPage from '@/features/jobs/JobsPage'
 import OldPendingPage from '@/features/old-pending/OldPendingPage'
 import RankingsPage from '@/features/rankings/RankingsPage'
 import PendingByBarcodePage from '@/features/pending-by-barcode/PendingByBarcodePage'
+import CountingPage from '@/features/counting/CountingPage'
 
 function ProtectedLayout() {
   const { isAuthenticated, isChecking } = useAuth()
@@ -41,6 +42,7 @@ const router = createBrowserRouter(
         { path: 'old-pending',         element: <OldPendingPage /> },
         { path: 'rankings',            element: <RankingsPage /> },
         { path: 'pending-by-barcode',  element: <PendingByBarcodePage /> },
+        { path: 'counting',            element: <CountingPage /> },
       ],
     },
     { path: '*', element: <Navigate to="/vektor" replace /> },

@@ -67,14 +67,23 @@ export interface ImportJob {
   finishedAt: string | null
 }
 
-export interface SeparationProduct {
-  id: number
-  separationOperationId: number
+export interface CountingItem {
   productCode: number
-  productDescription: string | null
-  quantity: number
-  quantityEmb: number | null
-  storeCode: number | null
-  status: string | null
-  createdAt: string
+  barcode: string | null
+  description: string | null
+  complement: string | null
+  currentStock: number
+}
+
+export interface SeparationProduct {
+  id: number;
+  separationOperationId: number;
+  productCode: number;
+  productDescription: string | null;
+  quantity: number;
+  quantityEmb: number | null;
+  storeCode: number | null;
+  status: string | null;
+  createdAt: string;
+  productComplement: string | null;
 }
