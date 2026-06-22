@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom'
 import { useAuth } from '@/features/auth/AuthContext'
 import {
   AlertTriangle, History, FileText, Upload, LogOut,
-  Menu, X, BarChart2, Clock, Package, TrendingUp
+  Menu, X, BarChart2, Clock, Package, TrendingUp, ScanLine
 } from 'lucide-react'
 
 const nav = [
@@ -14,6 +14,7 @@ const nav = [
   { to: '/vektor/jobs',                label: 'Jobs',         icon: Clock,         group: 'Sistema' },
   { to: '/vektor/old-pending',         label: 'Pendências',   icon: Package,       group: 'Sistema' },
   { to: '/vektor/rankings',            label: 'Rankings',     icon: TrendingUp,    group: 'Análise' },
+  { to: '/vektor/pending-by-barcode',  label: 'Buscar Código', icon: ScanLine,      group: 'Sistema' },
 ]
 
 const groups = ['Divergências', 'Sistema', 'Análise']

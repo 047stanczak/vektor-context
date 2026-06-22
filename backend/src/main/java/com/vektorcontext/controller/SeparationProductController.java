@@ -1,6 +1,7 @@
 package com.vektorcontext.controller;
 
 import com.vektorcontext.dto.SeparationProductDTO;
+import com.vektorcontext.models.SeparationProduct;
 import com.vektorcontext.repository.SeparationProductRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,4 +57,24 @@ public class SeparationProductController {
             ).stream().map(SeparationProductDTO::from).toList()
         );
     }
+
+    @GetMapping("/pending-by-barcode")
+    public ResponseEntity<List<SeparationProductDTO>> pendingByBarcode(@RequestParam String barcode) {
+        return ResponseEntity.ok(
+            repository.findPendingByBarcode(barcode, LocalDate.now())
+                .stream().map(SeparationProductDTO::from).toList()
+        );
+    }
+
+    @GetMapping("/pending-by-code")
+    public ResponseEntity<List<SeparationProductDTO>> pendingByCode(@RequestParam String code) {
+        List<SeparationProduct> products;
+        try {
+            products = repository.findPendingByProductCode(Integer.parseInt(code), LocalDate.now());
+        } catch (NumberFormatException e) {
+            products = repository.findPendingByBarcode(code, LocalDate.now());
+        }
+        return ResponseEntity.ok(products.stream().map(SeparationProductDTO::from).toList());
+    }
+
 }

@@ -49,4 +49,11 @@ public interface SeparationProductRepository extends JpaRepository<SeparationPro
         @Param("limit") LocalDate limit,
         @Param("todayStart") LocalDateTime todayStart
     );
+
+    @Query("SELECT s FROM SeparationProduct s WHERE s.snapshotDate = :today AND s.product.barcode = :barcode")
+    List<SeparationProduct> findPendingByBarcode(@Param("barcode") String barcode, @Param("today") LocalDate today);
+
+    @Query("SELECT s FROM SeparationProduct s WHERE s.snapshotDate = :today AND s.productCode = :code")
+    List<SeparationProduct> findPendingByProductCode(@Param("code") Integer code, @Param("today") LocalDate today);
+
 }
