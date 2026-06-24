@@ -33,4 +33,10 @@ public interface StockSnapshotRepository extends JpaRepository<StockSnapshot, Lo
     @Query("SELECT s FROM StockSnapshot s WHERE s.product.department = :department AND CAST(s.capturedAt AS DATE) = :today AND s.currentStock > 0")
     List<StockSnapshot> findByDepartmentToday(@Param("department") String department, @Param("today") LocalDate today);
 
+    @Query("SELECT s FROM StockSnapshot s WHERE s.product.barcode = :q AND CAST(s.capturedAt AS DATE) = :today AND s.currentStock > 0")
+    List<StockSnapshot> searchByBarcodeToday(@Param("q") String q, @Param("today") LocalDate today);
+
+    @Query("SELECT s FROM StockSnapshot s WHERE s.productCode = :code AND CAST(s.capturedAt AS DATE) = :today AND s.currentStock > 0")
+    List<StockSnapshot> searchByProductCodeToday(@Param("code") Integer code, @Param("today") LocalDate today);
+
 }
