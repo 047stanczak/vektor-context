@@ -1,6 +1,7 @@
 package com.vektorcontext.controller;
 
 import com.vektorcontext.dto.CountingItemDTO;
+import com.vektorcontext.dto.CountingReportRequest;
 import com.vektorcontext.models.StockSnapshot;
 import com.vektorcontext.repository.StockSnapshotRepository;
 import com.vektorcontext.services.PdfCountingService;
@@ -66,13 +67,23 @@ public class CountingController {
             .orElse(ResponseEntity.ok(""));
     }
 
-    @GetMapping("/report/pdf")
-    public ResponseEntity<byte[]> reportPdf(@RequestParam String brand) {
-        List<CountingItemDTO> items = deduplicated(repository.findByBrandToday(brand, LocalDate.now()));
-        byte[] pdf = pdfCountingService.generate(brand, items);
+    @GetMapping("/search")
+    public ResponseEntity<List<CountingItemDTO>> search(@RequestParam String q) {
+        List<StockSnapshot> results = repository.searchByBarcodeToday(q, LocalDate.now());
+        if (results.isEmpty()) {
+            try {
+                results = repository.searchByProductCodeToday(Integer.parseInt(q), LocalDate.now());
+            } catch (NumberFormatException ignored) {}
+        }
+        return ResponseEntity.ok(deduplicated(results));
+    }
+
+    @PostMapping("/report/pdf")
+    public ResponseEntity<byte[]> reportPdf(@RequestBody CountingReportRequest request) {
+        byte[] pdf = pdfCountingService.generate(request);
         return ResponseEntity.ok()
             .header("Content-Type", "application/pdf")
-            .header("Content-Disposition", "inline; filename=\"contagem-" + brand + ".pdf\"")
+            .header("Content-Disposition", "inline; filename=\"contagem.pdf\"")
             .body(pdf);
     }
 
