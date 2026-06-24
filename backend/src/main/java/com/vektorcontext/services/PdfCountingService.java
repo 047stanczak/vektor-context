@@ -4,11 +4,11 @@ import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
 import com.lowagie.text.pdf.draw.LineSeparator;
 import com.vektorcontext.dto.CountingItemDTO;
+import com.vektorcontext.dto.CountingReportRequest;
 import org.springframework.stereotype.Service;
 
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
-import java.util.List;
 
 @Service
 public class PdfCountingService {
@@ -19,16 +19,16 @@ public class PdfCountingService {
     private static final Color COLOR_BORDER     = new Color(204, 204, 204);
     private static final Color COLOR_TEXT_MUTED = new Color(107, 114, 128);
 
-    public byte[] generate(String brand, List<CountingItemDTO> items) {
+    public byte[] generate(CountingReportRequest request) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             Document document = new Document(PageSize.A4, 30, 30, 30, 30);
             PdfWriter writer = PdfWriter.getInstance(document, baos);
             writer.setPageEvent(new PageFooter());
             document.open();
-            addTitle(document, brand, items.size());
+            addTitle(document, request);
             document.add(new Chunk("\n"));
-            addTable(document, items);
+            addTable(document, request);
             addSignatureArea(document);
             document.close();
             return baos.toByteArray();
@@ -37,11 +37,15 @@ public class PdfCountingService {
         }
     }
 
-    private void addTitle(Document document, String brand, int total) throws DocumentException {
+    private void addTitle(Document document, CountingReportRequest request) throws DocumentException {
         Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 13, COLOR_HEADER_BG);
         Font subFont   = FontFactory.getFont(FontFactory.HELVETICA, 9, COLOR_TEXT_MUTED);
-        document.add(new Paragraph("CONTAGEM - " + brand.toUpperCase(), titleFont));
-        Paragraph sub = new Paragraph("Produtos: " + total, subFont);
+        document.add(new Paragraph("CONTAGEM - " + nvl(request.getAuditedLabel()).toUpperCase(), titleFont));
+        Paragraph sub = new Paragraph(
+            String.format("Auditado em: %s   •   Tipo: %s   •   Produtos: %d",
+                nvl(request.getAuditedAt()), nvl(request.getAuditType()), request.getItems().size()),
+            subFont
+        );
         sub.setSpacingAfter(8);
         document.add(sub);
         LineSeparator line = new LineSeparator();
@@ -50,7 +54,7 @@ public class PdfCountingService {
         document.add(new Chunk("\n"));
     }
 
-    private void addTable(Document document, List<CountingItemDTO> items) throws DocumentException {
+    private void addTable(Document document, CountingReportRequest request) throws DocumentException {
         float[] widths = {1.0f, 2.0f, 3.5f, 2.0f, 1.2f, 1.2f};
         PdfPTable table = new PdfPTable(widths);
         table.setWidthPercentage(100);
@@ -71,7 +75,7 @@ public class PdfCountingService {
 
         Font font = FontFactory.getFont(FontFactory.HELVETICA, 7.5f, Color.BLACK);
         boolean alt = false;
-        for (CountingItemDTO item : items) {
+        for (CountingItemDTO item : request.getItems()) {
             Color bg = alt ? COLOR_ROW_ALT : Color.WHITE;
             addCell(table, String.valueOf(item.getProductCode()), font, bg, Element.ALIGN_CENTER);
             addCell(table, nvl(item.getBarcode()), font, bg, Element.ALIGN_CENTER);
@@ -99,10 +103,6 @@ public class PdfCountingService {
         document.add(new Chunk("\n\n"));
         Font sigFont    = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 9, COLOR_HEADER_BG);
         Font normalFont = FontFactory.getFont(FontFactory.HELVETICA, 8, Color.BLACK);
-
-        Paragraph dateLabel = new Paragraph("Data: ___/___/______", normalFont);
-        dateLabel.setSpacingAfter(20);
-        document.add(dateLabel);
 
         Paragraph obsLabel = new Paragraph("Observações:", sigFont);
         obsLabel.setSpacingBefore(8);
