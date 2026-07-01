@@ -56,7 +56,7 @@ export default function LoginPage() {
                 <User className="field-icon" />
                 <Input
                   id="codeUser"
-                  className="field-with-icon"
+                  className="pl-9"
                   value={codeUser}
                   onChange={(e) => setCodeUser(e.target.value)}
                   placeholder="Código do usuário"
@@ -72,7 +72,7 @@ export default function LoginPage() {
                 <Input
                   id="password"
                   type="password"
-                  className="field-with-icon"
+                  className="pl-9"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
