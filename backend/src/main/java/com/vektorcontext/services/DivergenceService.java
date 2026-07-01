@@ -109,6 +109,7 @@ public class DivergenceService {
         response.setBarcode(product.getBarcode());
         response.setCurrentStock(currentStock);
         response.setSeparatorName(separatorName);
+        response.setSeparationDate(transactionFinder.findSeparationDate(product.getCode(), storeCode));
         return response;
     }
 

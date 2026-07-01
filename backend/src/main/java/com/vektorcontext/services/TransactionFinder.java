@@ -8,6 +8,7 @@ import com.vektorcontext.repository.StockSnapshotRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
@@ -39,6 +40,14 @@ public class TransactionFinder {
         }
 
         return operation.getUserName();
+    }
+
+    @Transactional(readOnly = true)
+    public LocalDate findSeparationDate(Integer productCode, Integer storeCode) {
+        return separatedProductRepository
+                .findTopByProductCodeAndStoreCodeOrderByDateDesc(productCode, storeCode)
+                .map(SeparatedProduct::getDate)
+                .orElse(null);
     }
 
     public Double findCurrentStock(Integer productCode) {

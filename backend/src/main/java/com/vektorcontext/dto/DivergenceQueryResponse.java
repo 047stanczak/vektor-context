@@ -1,5 +1,7 @@
 package com.vektorcontext.dto;
 
+import java.time.LocalDate;
+
 public class DivergenceQueryResponse {
 
     private Integer productCode;
@@ -8,6 +10,7 @@ public class DivergenceQueryResponse {
     private String barcode;
     private Double currentStock;
     private String separatorName;
+    private LocalDate separationDate;
 
     public Integer getProductCode() {
         return productCode;
@@ -55,5 +58,13 @@ public class DivergenceQueryResponse {
 
     public void setSeparatorName(String separatorName) {
         this.separatorName = separatorName;
+    }
+
+    public LocalDate getSeparationDate() {
+        return separationDate;
+    }
+
+    public void setSeparationDate(LocalDate separationDate) {
+        this.separationDate = separationDate;
     }
 }

@@ -10,6 +10,7 @@ public class SeparationProductDTO {
     private String storeCode;
     private Double quantity;
     private String productComplement;
+    private Double currentStock;
 
     public static SeparationProductDTO from(SeparationProduct s) {
         SeparationProductDTO dto = new SeparationProductDTO();
@@ -19,6 +20,12 @@ public class SeparationProductDTO {
         dto.storeCode = s.getStoreCode();
         dto.quantity = s.getQuantity();
         dto.productComplement = s.getProduct() != null ? s.getProduct().getComplement() : null;
+        return dto;
+    }
+
+    public static SeparationProductDTO from(SeparationProduct s, Double currentStock) {
+        SeparationProductDTO dto = from(s);
+        dto.currentStock = currentStock;
         return dto;
     }
 
