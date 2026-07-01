@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider, Navigate, Outlet } from 'react-rou
 import { useAuth } from '@/features/auth/AuthContext'
 import AppShell from './layout/AppShell'
 import LoginPage from '@/features/auth/LoginPage'
+import HomePage from '@/features/home/HomePage'
 import DivergenceNewPage from '@/features/divergences/DivergenceNewPage'
 import DivergenceHistoryPage from '@/features/divergences/DivergenceHistoryPage'
 import DivergenceReportPage from '@/features/divergences/DivergenceReportPage'
@@ -11,15 +12,13 @@ import OldPendingPage from '@/features/old-pending/OldPendingPage'
 import RankingsPage from '@/features/rankings/RankingsPage'
 import PendingByBarcodePage from '@/features/pending-by-barcode/PendingByBarcodePage'
 import CountingPage from '@/features/counting/CountingPage'
+import RequestPendingPage from '@/features/request-pending/RequestPendingPage'
+import { PageSpinner } from '@/components/ui/spinner'
 
 function ProtectedLayout() {
   const { isAuthenticated, isChecking } = useAuth()
 
-  if (isChecking) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: '#f5f6fa' }}>
-      <div className="w-7 h-7 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: 'var(--accent)', borderTopColor: 'transparent' }} />
-    </div>
-  )
+  if (isChecking) return <PageSpinner />
 
   if (!isAuthenticated) return <Navigate to="/vektor/login" replace />
 
@@ -33,7 +32,7 @@ const router = createBrowserRouter(
       path: '/vektor',
       element: <ProtectedLayout />,
       children: [
-        { index: true, element: <Navigate to="divergences/new" replace /> },
+        { index: true, element: <HomePage /> },
         { path: 'divergences/new',     element: <DivergenceNewPage /> },
         { path: 'divergences/history', element: <DivergenceHistoryPage /> },
         { path: 'divergences/report',  element: <DivergenceReportPage /> },
@@ -43,6 +42,7 @@ const router = createBrowserRouter(
         { path: 'rankings',            element: <RankingsPage /> },
         { path: 'pending-by-barcode',  element: <PendingByBarcodePage /> },
         { path: 'counting',            element: <CountingPage /> },
+        { path: 'request-pending',     element: <RequestPendingPage /> },
       ],
     },
     { path: '*', element: <Navigate to="/vektor" replace /> },

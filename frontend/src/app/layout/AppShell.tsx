@@ -1,47 +1,68 @@
 import { useState, ReactNode } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import { useAuth } from '@/features/auth/AuthContext'
 import {
   AlertTriangle, History, FileText, Upload, LogOut,
-  Menu, X, BarChart2, Clock, Package, TrendingUp, ScanLine, ClipboardList
+  Menu, X, BarChart2, Clock, Package, TrendingUp, ScanLine, ClipboardList, MessageSquare
 } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 
 const nav = [
-  { to: '/vektor/divergences/new',     label: 'Registrar',    icon: AlertTriangle, group: 'Divergências' },
-  { to: '/vektor/divergences/history', label: 'Histórico',    icon: History,       group: 'Divergências' },
-  { to: '/vektor/divergences/report',  label: 'Relatório',    icon: FileText,      group: 'Divergências' },
-  { to: '/vektor/uploads',             label: 'Importar',     icon: Upload,        group: 'Sistema' },
-  { to: '/vektor/jobs',                label: 'Jobs',         icon: Clock,         group: 'Sistema' },
-  { to: '/vektor/old-pending',         label: 'Pendências',   icon: Package,       group: 'Sistema' },
-  { to: '/vektor/rankings',            label: 'Rankings',     icon: TrendingUp,    group: 'Análise' },
-  { to: '/vektor/pending-by-barcode',  label: 'Buscar Código', icon: ScanLine,        group: 'Sistema' },
-  { to: '/vektor/counting',            label: 'Contagem',      icon: ClipboardList,   group: 'Sistema' },
+  { to: '/vektor/divergences/new',     label: 'Registrar',       icon: AlertTriangle, group: 'Divergências' },
+  { to: '/vektor/divergences/history', label: 'Histórico',       icon: History,       group: 'Divergências' },
+  { to: '/vektor/divergences/report',  label: 'Relatório',       icon: FileText,      group: 'Divergências' },
+  { to: '/vektor/uploads',             label: 'Importar',        icon: Upload,        group: 'Sistema' },
+  { to: '/vektor/jobs',                label: 'Jobs',            icon: Clock,         group: 'Sistema' },
+  { to: '/vektor/old-pending',         label: 'Pendências',      icon: Package,       group: 'Sistema' },
+  { to: '/vektor/rankings',            label: 'Rankings',        icon: TrendingUp,    group: 'Análise' },
+  { to: '/vektor/pending-by-barcode',  label: 'Buscar Código',   icon: ScanLine,      group: 'Sistema' },
+  { to: '/vektor/counting',            label: 'Contagem',        icon: ClipboardList, group: 'Sistema' },
+  { to: '/vektor/request-pending',     label: 'Pedir Pendência', icon: MessageSquare, group: 'Sistema' },
 ]
 
 const groups = ['Divergências', 'Sistema', 'Análise']
+
+const routeTitles: Record<string, string> = {
+  '/vektor': 'Início',
+  '/vektor/divergences/new': 'Registrar divergência',
+  '/vektor/divergences/history': 'Histórico',
+  '/vektor/divergences/report': 'Relatório',
+  '/vektor/uploads': 'Importar arquivos',
+  '/vektor/jobs': 'Jobs de importação',
+  '/vektor/old-pending': 'Pendências antigas',
+  '/vektor/rankings': 'Rankings',
+  '/vektor/pending-by-barcode': 'Buscar por código',
+  '/vektor/counting': 'Contagem',
+  '/vektor/request-pending': 'Pedir pendência',
+}
 
 function SidebarContent({ onClose }: { onClose?: () => void }) {
   const { logout } = useAuth()
 
   return (
-    <div className="flex flex-col h-full" style={{ background: 'var(--sidebar-bg)' }}>
-      <div className="flex items-center gap-3 px-5 py-5" style={{ borderBottom: '1px solid var(--sidebar-border)' }}>
-        <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
-          style={{ background: 'var(--accent)', boxShadow: '0 0 16px rgba(79,126,248,0.4)' }}>
-          <BarChart2 className="w-4 h-4 text-white" />
-        </div>
-        <span className="font-bold text-white text-sm tracking-tight">VektorContext</span>
+    <div className="flex h-full flex-col bg-sidebar">
+      <div className="flex items-center gap-3 border-b border-sidebar px-4 py-4">
+        <NavLink to="/vektor" onClick={onClose} className="flex min-w-0 flex-1 items-center gap-3 no-underline">
+          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground shadow-sm">
+            <BarChart2 className="h-4 w-4" />
+          </div>
+          <div className="min-w-0">
+            <span className="block truncate text-sm font-semibold text-sidebar-foreground">VektorContext</span>
+            <span className="block truncate text-[11px] text-sidebar-muted">Sistema de divergências</span>
+          </div>
+        </NavLink>
         {onClose && (
-          <button onClick={onClose} className="ml-auto text-gray-500 hover:text-white transition-colors">
-            <X className="w-4 h-4" />
-          </button>
+          <Button variant="ghost" size="icon" onClick={onClose} className="text-sidebar-muted hover:text-sidebar-foreground">
+            <X className="h-4 w-4" />
+          </Button>
         )}
       </div>
 
-      <nav className="flex-1 px-3 py-4 space-y-5 overflow-y-auto">
+      <nav className="flex-1 space-y-5 overflow-y-auto px-3 py-4">
         {groups.map((group) => (
           <div key={group}>
-            <div className="px-3 mb-1.5 text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.25)' }}>
+            <div className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-widest text-sidebar-muted">
               {group}
             </div>
             <div className="space-y-0.5">
@@ -51,16 +72,10 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
                   to={to}
                   onClick={onClose}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
-                      isActive ? 'text-white' : 'hover:text-white'
-                    }`
-                  }
-                  style={({ isActive }) => isActive
-                    ? { background: 'var(--accent)', boxShadow: '0 2px 12px rgba(79,126,248,0.35)', color: 'white' }
-                    : { color: 'rgba(255,255,255,0.45)' }
+                    cn(isActive ? 'sidebar-nav-link-active' : 'sidebar-nav-link')
                   }
                 >
-                  <Icon className="w-4 h-4 flex-shrink-0" />
+                  <Icon className="h-4 w-4 flex-shrink-0" />
                   {label}
                 </NavLink>
               ))}
@@ -69,15 +84,12 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
         ))}
       </nav>
 
-      <div className="px-3 py-4" style={{ borderTop: '1px solid var(--sidebar-border)' }}>
+      <div className="border-t border-sidebar p-3">
         <button
           onClick={logout}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium w-full transition-all duration-150 hover:text-white"
-          style={{ color: 'rgba(255,255,255,0.4)' }}
-          onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
-          onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+          className="sidebar-nav-link w-full text-left"
         >
-          <LogOut className="w-4 h-4" />
+          <LogOut className="h-4 w-4" />
           Sair
         </button>
       </div>
@@ -87,32 +99,51 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const location = useLocation()
+  const pageTitle = routeTitles[location.pathname] ?? 'VektorContext'
 
   return (
-    <div className="flex h-screen" style={{ background: '#f5f6fa' }}>
-      <aside className="hidden lg:flex flex-col w-56 flex-shrink-0" style={{ background: 'var(--sidebar-bg)' }}>
+    <div className="flex min-h-screen bg-muted/30">
+      <aside className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-sidebar lg:flex-col border-r border-sidebar">
         <SidebarContent />
       </aside>
 
       {mobileOpen && (
-        <div className="lg:hidden fixed inset-0 z-40 flex">
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
-          <aside className="relative z-50 flex flex-col w-56" style={{ background: 'var(--sidebar-bg)' }}>
+        <div className="fixed inset-0 z-50 flex lg:hidden">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
+          <aside className="relative z-50 flex w-sidebar flex-col border-r border-sidebar shadow-xl">
             <SidebarContent onClose={() => setMobileOpen(false)} />
           </aside>
         </div>
       )}
 
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="lg:hidden flex items-center gap-3 px-4 py-3 bg-white border-b border-gray-100">
-          <button onClick={() => setMobileOpen(true)} className="text-gray-500 hover:text-gray-900 transition-colors">
-            <Menu className="w-5 h-5" />
-          </button>
-          <span className="font-bold text-gray-900 text-sm">VektorContext</span>
+      <div className="flex min-h-screen flex-1 flex-col lg:pl-sidebar">
+        <header className="sticky top-0 z-40 flex h-header items-center gap-3 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:px-6">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="lg:hidden"
+            onClick={() => setMobileOpen(true)}
+            aria-label="Abrir menu"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+
+          <div className="flex min-w-0 flex-1 items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/10 text-primary lg:hidden">
+              <BarChart2 className="h-4 w-4" />
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-foreground">{pageTitle}</p>
+              <p className="hidden truncate text-xs text-muted-foreground sm:block">VektorContext</p>
+            </div>
+          </div>
         </header>
 
-        <main className="flex-1 overflow-auto p-4 lg:p-7">
-          {children}
+        <main className="flex-1 overflow-auto p-4 lg:p-6">
+          <div className="mx-auto w-full max-w-5xl">
+            {children}
+          </div>
         </main>
       </div>
     </div>
