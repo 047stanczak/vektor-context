@@ -16,7 +16,7 @@ import com.vektorcontext.models.User;
 @Service
 public class TokenSecurity {
 
-    @Value("${JWT_SECRET:secret}")
+    @Value("${JWT_SECRET}")
     private String secret;
 
     public String generateToken(User user) {

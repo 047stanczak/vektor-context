@@ -12,6 +12,7 @@ import com.vektorcontext.services.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,9 @@ public class AuthController {
 
     private final AuthService authService;
     private final TokenSecurity tokenSecurity;
+
+    @Value("${COOKIE_SECURE:true}")
+    private boolean cookieSecure;
 
     public AuthController(AuthService authService, TokenSecurity tokenSecurity) {
         this.authService = authService;
@@ -55,7 +59,7 @@ public class AuthController {
         ResponseCookie cookie = ResponseCookie
                 .from("token", token)
                 .httpOnly(true)
-                .secure(false)
+                .secure(cookieSecure)
                 .path("/")
                 .maxAge(60 * 60)
                 .sameSite("Lax")
@@ -72,7 +76,7 @@ public class AuthController {
         ResponseCookie cookie = ResponseCookie
                 .from("token", "")
                 .httpOnly(true)
-                .secure(false)
+                .secure(cookieSecure)
                 .path("/")
                 .maxAge(0)
                 .sameSite("Lax")
