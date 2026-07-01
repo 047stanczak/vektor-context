@@ -50,11 +50,13 @@ Veja [`infra/.env.example`](infra/.env.example) para a lista completa de variáv
 
 ## Endpoints principais
 
-Todos os endpoints (exceto `/api/login`) requerem autenticação.
+Todos os endpoints (exceto `/api/login` e `/api/register`) requerem autenticação.
 
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
+| POST | `/api/register` | Criar usuário |
 | POST | `/api/login` | Autenticação |
+| POST | `/api/logout` | Logout |
 | POST | `/api/divergence` | Registrar divergências |
 | GET | `/api/divergence` | Listar por data |
 | GET | `/api/divergence/query` | Consultar produto |
@@ -64,6 +66,33 @@ Todos os endpoints (exceto `/api/login`) requerem autenticação.
 | GET | `/api/divergence/ranking/separator` | Ranking por separador |
 | GET | `/api/divergence/ranking/product` | Ranking por produto |
 | POST | `/api/import/products` | Importar produtos CSV |
-| POST | `/api/import/separation-products` | Importar separações CSV |
+| POST | `/api/import/separation-operations` | Importar operações de separação CSV |
+| POST | `/api/import/separated-products` | Importar produtos separados CSV |
+| POST | `/api/import/separation-products` | Importar produtos de separação CSV |
+| GET | `/api/status` | Listar todos os jobs de importação |
+| GET | `/api/status/{jobId}` | Status de um job de importação |
 | GET | `/api/old-pending` | Pendências antigas |
-| GET | `/api/status/{jobId}` | Status de importação |
+| GET | `/api/old-pending-with-stock` | Pendências antigas com estoque |
+| GET | `/api/old-pending-no-stock` | Pendências antigas sem estoque |
+| GET | `/api/pending-by-barcode` | Pendências por código de barras |
+| GET | `/api/pending-by-code` | Pendências por código (produto ou barras) |
+| GET | `/api/separation-operations/separators` | Listar separadores |
+| GET | `/api/tasks` | Listar tarefas |
+| POST | `/api/tasks` | Criar tarefa |
+| PUT | `/api/tasks/{id}` | Editar tarefa |
+| DELETE | `/api/tasks/{id}` | Remover tarefa |
+| POST | `/api/tasks/{id}/complete` | Concluir tarefa |
+| GET | `/api/audit` | Listar auditorias |
+| POST | `/api/audit` | Registrar auditoria |
+| GET | `/api/counting/brands` | Listar marcas (contagem) |
+| GET | `/api/counting/by-brand` | Contagem por marca |
+| GET | `/api/counting/departments` | Listar departamentos (contagem) |
+| GET | `/api/counting/by-department` | Contagem por departamento |
+| GET | `/api/counting/by-product` | Contagem por produto |
+| GET | `/api/counting/brand-by-product` | Marca de um produto |
+| GET | `/api/counting/search` | Buscar item de contagem |
+| POST | `/api/counting/report/pdf` | Gerar relatório PDF de contagem |
+
+## Documentação interativa (Swagger)
+
+Disponível em `/swagger-ui.html` quando `SWAGGER_ENABLED=true` (desabilitado por padrão em produção).
