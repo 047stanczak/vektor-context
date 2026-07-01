@@ -14,6 +14,7 @@ export interface DivergenceQueryResponse {
   barcode: string
   currentStock: number | null
   separatorName: string | null
+  separationDate: string | null
 }
 
 export interface DivergenceRecordRequest {
@@ -86,4 +87,5 @@ export interface SeparationProduct {
   status: string | null;
   createdAt: string;
   productComplement: string | null;
+  currentStock?: number;
 }

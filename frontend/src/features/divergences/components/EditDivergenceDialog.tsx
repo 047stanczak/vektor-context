@@ -5,6 +5,14 @@ import { DivergenceRecord, Tipo } from '@/types'
 import { updateDivergence } from '../api'
 import { today } from '@/lib/utils'
 import SeparatorCombobox from './SeparatorCombobox'
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
 
 interface Props {
   record: DivergenceRecord | null
@@ -49,16 +57,15 @@ export default function EditDivergenceDialog({ record, onClose, queryKey }: Prop
     onError: (err: any) => toast.error(err.response?.data?.message ?? 'Erro ao atualizar'),
   })
 
-  if (!record) return null
-
   const set = (k: string) => (v: string) => setForm((f) => ({ ...f, [k]: v }))
   const setE = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setForm((f) => ({ ...f, [k]: e.target.value }))
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="fixed inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4 max-h-screen overflow-auto">
-        <h3 className="font-semibold text-gray-900 mb-4">Editar divergência #{record.id}</h3>
+    <Dialog open={!!record} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Editar divergência #{record?.id}</DialogTitle>
+        </DialogHeader>
 
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
@@ -73,7 +80,7 @@ export default function EditDivergenceDialog({ record, onClose, queryKey }: Prop
           </div>
           <div>
             <label className="label">Produto</label>
-            <input className="field bg-gray-50" value={record.productCode} readOnly />
+            <input className="field bg-muted" value={record?.productCode ?? ''} readOnly />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -101,13 +108,13 @@ export default function EditDivergenceDialog({ record, onClose, queryKey }: Prop
           </div>
         </div>
 
-        <div className="flex gap-2 mt-5">
-          <button onClick={onClose} className="flex-1 bg-gray-100 text-gray-800 rounded-lg py-2 text-sm font-medium hover:bg-gray-200 transition-colors">Cancelar</button>
-          <button onClick={() => mut.mutate()} disabled={mut.isPending} className="flex-1 bg-blue-600 text-white rounded-lg py-2 text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors">
+        <DialogFooter>
+          <Button variant="secondary" onClick={onClose}>Cancelar</Button>
+          <Button onClick={() => mut.mutate()} disabled={mut.isPending}>
             {mut.isPending ? 'Salvando...' : 'Salvar'}
-          </button>
-        </div>
-      </div>
-    </div>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

@@ -4,6 +4,8 @@ import { toast } from 'sonner'
 import { ImportJob } from '@/types'
 import { uploadProducts, uploadSeparatedProducts, uploadSeparationOperations, uploadSeparationProducts } from './api'
 import { Upload, CheckCircle, XCircle, Loader2, AlertCircle } from 'lucide-react'
+import { PageHeader } from '@/components/ui/page-header'
+import { Button } from '@/components/ui/button'
 
 interface CardProps {
   title: string
@@ -39,8 +41,7 @@ function UploadCard({ title, description, filename, step, onUpload }: CardProps)
   return (
     <div className="card p-5 transition-all duration-200 hover:shadow-md">
       <div className="flex items-start gap-4">
-        <div className="flex-shrink-0 w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold text-white"
-          style={{ background: 'var(--accent)' }}>
+        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md bg-primary text-xs font-bold text-primary-foreground">
           {step}
         </div>
         <div className="flex-1 min-w-0">
@@ -67,18 +68,17 @@ function UploadCard({ title, description, filename, step, onUpload }: CardProps)
           )}
 
           <input ref={inputRef} type="file" accept=".txt,.csv" className="hidden" onChange={handleChange} />
-          <button
+          <Button
+            variant="accent"
+            size="sm"
             onClick={() => inputRef.current?.click()}
             disabled={mut.isPending}
-            className="mt-3 flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150 active:scale-[0.98] disabled:opacity-50"
-            style={{ background: 'var(--accent-subtle)', color: 'var(--accent)' }}
-            onMouseEnter={(e) => !mut.isPending && (e.currentTarget.style.background = 'var(--accent-subtle-hover)')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = 'var(--accent-subtle)')}
+            className="mt-3"
           >
             {mut.isPending
               ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Enviando...</>
               : <><Upload className="w-3.5 h-3.5" /> Selecionar arquivo</>}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -87,11 +87,11 @@ function UploadCard({ title, description, filename, step, onUpload }: CardProps)
 
 export default function UploadsPage() {
   return (
-    <div className="max-w-2xl mx-auto space-y-5 fade-in">
-      <div>
-        <h1 className="text-xl font-bold text-gray-900">Importar arquivos</h1>
-        <p className="text-sm text-gray-400 mt-1">Faça o upload dos arquivos exportados do ERP.</p>
-      </div>
+    <div className="space-y-5 fade-in">
+      <PageHeader
+        title="Importar arquivos"
+        description="Faça o upload dos arquivos exportados do ERP."
+      />
 
       <div className="space-y-3">
         <UploadCard
@@ -124,7 +124,7 @@ export default function UploadsPage() {
         />
       </div>
 
-      <div className="flex items-start gap-3 p-4 rounded-2xl bg-amber-50 border border-amber-100">
+      <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
         <AlertCircle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
         <p className="text-xs text-amber-700">
           <strong>Ordem recomendada:</strong> siga sempre a sequência numérica acima para garantir que os separadores sejam vinculados corretamente antes das transações.

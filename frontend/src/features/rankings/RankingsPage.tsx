@@ -2,6 +2,9 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { fetchRankBySeparator, fetchRankByProduct, RankingItem } from './api'
 import { Loader2, Users, Package, Search } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { PageHeader } from '@/components/ui/page-header'
+import { Button } from '@/components/ui/button'
 
 function today() {
   return new Date().toISOString().slice(0, 10)
@@ -26,8 +29,7 @@ function RankTable({ title, icon, items, isLoading, labelHeader }: RankTableProp
   return (
     <div className="card p-5 space-y-4">
       <div className="flex items-center gap-2">
-        <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
-          style={{ background: 'var(--accent-subtle)', color: 'var(--accent)' }}>
+        <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md bg-accent-subtle text-accent">
           {icon}
         </div>
         <h2 className="font-semibold text-gray-900 text-sm">{title}</h2>
@@ -52,13 +54,10 @@ function RankTable({ title, icon, items, isLoading, labelHeader }: RankTableProp
                 </div>
                 <span className="font-bold text-gray-700 flex-shrink-0 ml-2">{item.total}</span>
               </div>
-              <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden">
+              <div className="progress-track h-1.5">
                 <div
-                  className="h-full rounded-full transition-all duration-500"
-                  style={{
-                    width: `${(item.total / max) * 100}%`,
-                    background: i === 0 ? 'var(--accent)' : `rgba(79,126,248,${0.6 - i * 0.08})`
-                  }}
+                  className={cn('h-full rounded-full transition-all duration-500', i === 0 ? 'rank-bar-first' : 'rank-bar')}
+                  style={{ width: `${(item.total / max) * 100}%`, opacity: i === 0 ? 1 : Math.max(0.35, 0.7 - i * 0.08) }}
                 />
               </div>
             </div>
@@ -89,11 +88,11 @@ export default function RankingsPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-5 fade-in">
-      <div>
-        <h1 className="text-xl font-bold text-gray-900">Rankings</h1>
-        <p className="text-sm text-gray-400 mt-1">Separadores e produtos com mais divergências no período.</p>
-      </div>
+    <div className="space-y-5 fade-in">
+      <PageHeader
+        title="Rankings"
+        description="Separadores e produtos com mais divergências no período."
+      />
 
       {/* Filtro */}
       <div className="card p-4 flex flex-wrap items-end gap-3">
@@ -105,9 +104,9 @@ export default function RankingsPage() {
           <label className="label">Até</label>
           <input type="date" className="field" value={to} onChange={(e) => setTo(e.target.value)} />
         </div>
-        <button onClick={handleSearch} className="btn-primary">
+        <Button onClick={handleSearch}>
           <Search className="w-4 h-4" /> Buscar
-        </button>
+        </Button>
       </div>
 
       {/* Rankings */}

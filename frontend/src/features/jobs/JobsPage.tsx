@@ -32,17 +32,16 @@ export default function JobsPage() {
   })
 
   return (
-    <div className="max-w-3xl mx-auto space-y-5 fade-in">
-      <div className="flex items-center justify-between">
+    <div className="space-y-5 fade-in">
+      <div className="page-header">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Jobs de importação</h1>
-          <p className="text-sm text-gray-400 mt-1">Atualiza automaticamente a cada 8 segundos.</p>
+          <h1 className="page-title">Jobs de importação</h1>
+          <p className="page-description mt-1">Atualiza automaticamente a cada 8 segundos.</p>
         </div>
         <button
           onClick={() => refetch()}
           disabled={isFetching}
-          className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-150 active:scale-[0.98] disabled:opacity-50"
-          style={{ background: 'var(--accent-subtle)', color: 'var(--accent)' }}
+          className="btn-accent-soft"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin' : ''}`} />
           Atualizar
@@ -51,41 +50,41 @@ export default function JobsPage() {
 
       <div className="card overflow-hidden">
         {isLoading ? (
-          <div className="flex items-center justify-center py-16 text-gray-400 gap-2 text-sm">
+          <div className="loading-state">
             <Loader2 className="w-4 h-4 animate-spin" /> Carregando...
           </div>
         ) : jobs.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-gray-400 gap-2">
-            <Clock className="w-8 h-8 text-gray-200" />
+          <div className="empty-state">
+            <Clock className="w-8 h-8 text-muted-foreground/30" />
             <p className="text-sm">Nenhum job encontrado.</p>
           </div>
         ) : (
           <>
             {/* Desktop */}
             <div className="hidden md:block overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="data-table">
                 <thead>
-                  <tr className="border-b border-gray-100">
+                  <tr>
                     {['#', 'Tipo', 'Arquivo', 'Status', 'Iniciado em', 'Finalizado em'].map((h) => (
-                      <th key={h} className="px-5 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">{h}</th>
+                      <th key={h}>{h}</th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody>
                   {jobs.map((job) => {
                     const badge = statusBadge(job.status)
                     return (
-                      <tr key={job.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-5 py-3 mono text-xs text-gray-400">{job.id}</td>
-                        <td className="px-5 py-3 font-medium text-gray-800">{typeLabel(job.type)}</td>
-                        <td className="px-5 py-3 mono text-xs text-gray-400 max-w-[180px] truncate">{job.fileName}</td>
-                        <td className="px-5 py-3">
-                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold border ${badge.cls}`}>
+                      <tr key={job.id}>
+                        <td className="mono text-xs text-muted-foreground">{job.id}</td>
+                        <td className="font-medium">{typeLabel(job.type)}</td>
+                        <td className="mono text-xs text-muted-foreground max-w-[180px] truncate">{job.fileName}</td>
+                        <td>
+                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold border ${badge.cls}`}>
                             {badge.icon} {badge.label}
                           </span>
                         </td>
-                        <td className="px-5 py-3 text-xs text-gray-500 whitespace-nowrap">{fmt(job.startedAt)}</td>
-                        <td className="px-5 py-3 text-xs text-gray-500 whitespace-nowrap">{fmt(job.finishedAt)}</td>
+                        <td className="text-xs text-muted-foreground whitespace-nowrap">{fmt(job.startedAt)}</td>
+                        <td className="text-xs text-muted-foreground whitespace-nowrap">{fmt(job.finishedAt)}</td>
                       </tr>
                     )
                   })}
@@ -94,20 +93,20 @@ export default function JobsPage() {
             </div>
 
             {/* Mobile */}
-            <div className="md:hidden divide-y divide-gray-50">
+            <div className="md:hidden divide-y">
               {jobs.map((job) => {
                 const badge = statusBadge(job.status)
                 return (
                   <div key={job.id} className="p-4 space-y-2">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-semibold text-gray-800 text-sm">{typeLabel(job.type)}</span>
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold border ${badge.cls}`}>
+                      <span className="font-semibold text-sm">{typeLabel(job.type)}</span>
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold border ${badge.cls}`}>
                         {badge.icon} {badge.label}
                       </span>
                     </div>
-                    <p className="text-xs mono text-gray-400 truncate">{job.fileName}</p>
-                    {job.errorMessage && <p className="text-xs text-red-600">{job.errorMessage}</p>}
-                    <p className="text-xs text-gray-400">Iniciado: {fmt(job.startedAt)}</p>
+                    <p className="text-xs mono text-muted-foreground truncate">{job.fileName}</p>
+                    {job.errorMessage && <p className="text-xs text-destructive">{job.errorMessage}</p>}
+                    <p className="text-xs text-muted-foreground">Iniciado: {fmt(job.startedAt)}</p>
                   </div>
                 )
               })}

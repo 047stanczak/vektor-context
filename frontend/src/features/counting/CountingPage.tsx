@@ -115,16 +115,11 @@ export default function CountingPage() {
   const label = activeBrand || resolvedBrand
 
   return (
-    <div className="max-w-4xl mx-auto space-y-5 fade-in">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-gray-900">Contagem</h1>
+    <div className="space-y-5 fade-in">
+      <div className="page-header">
+        <h1 className="page-title">Contagem</h1>
         {filteredItems.length > 0 && label && (
-          <button
-            onClick={handlePrint}
-            disabled={printing}
-            className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold"
-            style={{ background: 'var(--accent-subtle)', color: 'var(--accent)' }}
-          >
+          <button onClick={handlePrint} disabled={printing} className="btn-accent-soft">
             {printing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Printer className="w-3.5 h-3.5" />}
             Imprimir
           </button>
@@ -133,7 +128,7 @@ export default function CountingPage() {
 
       <div className="flex flex-wrap gap-3">
         <select
-          className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
+          className="field w-auto min-w-[180px]"
           value={selectedBrand ?? ''}
           onChange={(e) => { setSelectedBrand(e.target.value); handleBrandSearch(e.target.value) }}
         >
@@ -142,7 +137,7 @@ export default function CountingPage() {
         </select>
 
         <select
-          className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
+          className="field w-auto min-w-[180px]"
           value={selectedDepartment ?? ''}
           onChange={(e) => { setSelectedDepartment(e.target.value); handleDepartmentSearch(e.target.value) }}
         >
@@ -153,7 +148,7 @@ export default function CountingPage() {
         <div className="flex gap-2">
           <input
             type="text"
-            className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
+            className="field flex-1"
             placeholder="Buscar marca manualmente"
             value={manualBrand}
             onChange={(e) => setManualBrand(e.target.value)}
@@ -163,11 +158,11 @@ export default function CountingPage() {
         </div>
       </div>
 
-      {activeBrand && <p className="text-xs text-gray-400">Marca/Departamento: {activeBrand}</p>}
-      {productCodeParam && !activeBrand && <p className="text-xs text-gray-400">Similares do produto {productCodeParam}</p>}
+      {activeBrand && <p className="text-xs text-muted-foreground">Marca/Departamento: {activeBrand}</p>}
+      {productCodeParam && !activeBrand && <p className="text-xs text-muted-foreground">Similares do produto {productCodeParam}</p>}
 
       {loading && (
-        <div className="flex items-center justify-center py-16 text-gray-400 gap-2 text-sm">
+        <div className="loading-state">
           <Loader2 className="w-4 h-4 animate-spin" /> Carregando...
         </div>
       )}
@@ -177,7 +172,7 @@ export default function CountingPage() {
           <div className="flex gap-2 items-center">
             <input
               type="text"
-              className="border border-gray-200 rounded-lg px-3 py-2 text-sm flex-1"
+              className="field flex-1"
               placeholder="Adicionar produto (código ou barcode)"
               value={searchQ}
               onChange={(e) => setSearchQ(e.target.value)}
@@ -193,29 +188,29 @@ export default function CountingPage() {
             )}
           </div>
           {searchResult && (
-            <p className="text-xs text-gray-500">{searchResult.productCode} — {searchResult.description}</p>
+            <p className="text-xs text-muted-foreground">{searchResult.productCode} - {searchResult.description}</p>
           )}
 
           <div className="card overflow-hidden">
-            <table className="w-full text-sm">
+            <table className="data-table">
               <thead>
-                <tr className="border-b border-gray-100">
+                <tr>
                   {['Código', 'Barcode', 'Descrição', 'Complemento', 'Estoque', ''].map((h) => (
-                    <th key={h} className="px-5 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">{h}</th>
+                    <th key={h}>{h}</th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody>
                 {filteredItems.map((item) => (
-                  <tr key={item.productCode} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-5 py-3 mono text-xs font-medium text-gray-800">{item.productCode}</td>
-                    <td className="px-5 py-3 mono text-xs text-gray-500">{item.barcode ?? '—'}</td>
-                    <td className="px-5 py-3 text-xs text-gray-600 max-w-[200px] truncate">{item.description ?? '—'}</td>
-                    <td className="px-5 py-3 text-xs text-gray-500 max-w-[160px] truncate">{item.complement ?? '—'}</td>
-                    <td className="px-5 py-3 text-xs font-semibold text-gray-700">{item.currentStock}</td>
-                    <td className="px-5 py-3">
-                      <button onClick={() => handleRemove(item.productCode)}>
-                        <Trash2 className="w-3.5 h-3.5 text-gray-300 hover:text-red-400" />
+                  <tr key={item.productCode}>
+                    <td className="mono text-xs font-medium">{item.productCode}</td>
+                    <td className="mono text-xs text-muted-foreground">{item.barcode ?? '—'}</td>
+                    <td className="text-xs max-w-[200px] truncate">{item.description ?? '—'}</td>
+                    <td className="text-xs text-muted-foreground max-w-[160px] truncate">{item.complement ?? '—'}</td>
+                    <td className="text-xs font-semibold">{item.currentStock}</td>
+                    <td>
+                      <button onClick={() => handleRemove(item.productCode)} className="btn-icon-danger">
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </td>
                   </tr>
@@ -223,19 +218,18 @@ export default function CountingPage() {
               </tbody>
             </table>
           </div>
-          <p className="text-xs text-gray-400 text-right">{filteredItems.length} produto(s)</p>
+          <p className="text-xs text-muted-foreground text-right">{filteredItems.length} produto(s)</p>
         </>
       )}
 
       {!loading && (productCodeParam || activeBrand) && filteredItems.length === 0 && (
-        <div className="card p-5 text-sm text-gray-400 text-center">Nenhum produto encontrado.</div>
+        <div className="card p-5 text-sm text-muted-foreground text-center">Nenhum produto encontrado.</div>
       )}
 
       {/* FAB Auditorias */}
       <button
         onClick={() => setShowAudit(true)}
-        className="fixed bottom-6 right-6 w-12 h-12 rounded-full shadow-lg flex items-center justify-center z-40"
-        style={{ background: 'var(--accent)', color: 'white' }}
+        className="fixed bottom-6 right-6 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105 active:scale-95"
         title="Auditorias"
       >
         <ClipboardCheck className="w-5 h-5" />
@@ -246,21 +240,21 @@ export default function CountingPage() {
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
           <div className="card p-6 w-full max-w-md space-y-4 max-h-[80vh] flex flex-col">
             <div className="flex items-center justify-between">
-              <h2 className="font-bold text-gray-900">Auditorias</h2>
-              <button onClick={() => setShowAudit(false)}><X className="w-4 h-4 text-gray-400" /></button>
+              <h2 className="font-bold">Auditorias</h2>
+              <button onClick={() => setShowAudit(false)} className="btn-icon"><X className="w-4 h-4" /></button>
             </div>
 
             <div className="space-y-3">
               <input
                 type="text"
-                className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full"
+                className="field w-full"
                 placeholder="O que foi auditado"
                 value={auditLabel}
                 onChange={(e) => setAuditLabel(e.target.value)}
               />
               <div className="flex gap-2">
                 <select
-                  className="border border-gray-200 rounded-lg px-3 py-2 text-sm flex-1"
+                  className="field flex-1"
                   value={auditType}
                   onChange={(e) => setAuditType(e.target.value)}
                 >
@@ -283,14 +277,14 @@ export default function CountingPage() {
               </button>
             </div>
 
-            <div className="overflow-y-auto flex-1 divide-y divide-gray-50">
+            <div className="overflow-y-auto flex-1 divide-y">
               {audits.length === 0 && (
-                <p className="text-xs text-gray-400 text-center py-4">Nenhuma auditoria registrada.</p>
+                <p className="text-xs text-muted-foreground text-center py-4">Nenhuma auditoria registrada.</p>
               )}
               {audits.map((a: AuditRecord) => (
                 <div key={a.id} className="py-3 space-y-0.5">
-                  <p className="text-sm font-medium text-gray-800">{a.auditedLabel}</p>
-                  <p className="text-xs text-gray-400">{a.auditType} — {a.auditedAt}</p>
+                  <p className="text-sm font-medium">{a.auditedLabel}</p>
+                  <p className="text-xs text-muted-foreground">{a.auditType} - {a.auditedAt}</p>
                 </div>
               ))}
             </div>

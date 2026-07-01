@@ -79,6 +79,7 @@ export default function DivergenceNewPage() {
       barcode: '',
       currentStock: item.currentStock,
       separatorName: item.separatorName,
+      separationDate: null,
     } : null)
     setItems((prev) => prev.filter((i) => i.draftId !== editingId))
     setEditingId(null)
@@ -206,11 +207,10 @@ export default function DivergenceNewPage() {
   })
 
   return (
-    <div className="max-w-3xl mx-auto space-y-5">
-      <h1 className="text-xl font-semibold text-gray-900">Registrar divergências</h1>
+    <div className="space-y-5 fade-in">
+      <h1 className="page-title">Registrar divergências</h1>
 
-      {/* Form card */}
-      <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
+      <div className="card p-5 space-y-4">
 
         {/* Loja + Data */}
         <div className="grid grid-cols-2 gap-4">
@@ -231,9 +231,7 @@ export default function DivergenceNewPage() {
             <div className="flex gap-1 text-xs">
               {(['productCode', 'barcode'] as const).map((m) => (
                 <button key={m} onClick={() => setInputMode(m)}
-                  className={`px-2 py-0.5 rounded-full border transition-colors ${inputMode === m
-                    ? 'bg-blue-600 text-white border-blue-600'
-                    : 'bg-white text-gray-500 border-gray-300 hover:border-gray-400'}`}>
+                  className={inputMode === m ? 'toggle-pill-active' : 'toggle-pill'}>
                   {m === 'productCode' ? 'Código' : 'Barcode'}
                 </button>
               ))}
@@ -251,7 +249,7 @@ export default function DivergenceNewPage() {
             />
             {queryLoading
               ? <div className="absolute right-2.5 top-2.5 w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-              : <Search className="absolute right-2.5 top-2.5 w-4 h-4 text-gray-400" />}
+              : <Search className="absolute right-2.5 top-2.5 w-4 h-4 text-muted-foreground" />}
           </div>
 
           {queryError && (
@@ -316,7 +314,7 @@ export default function DivergenceNewPage() {
           </div>
           <div>
             <label className="label">Estoque CD</label>
-            <input className="field bg-gray-50 text-gray-500"
+            <input className="field bg-muted text-muted-foreground"
               value={queryResult?.currentStock != null ? String(queryResult.currentStock) : ''}
               readOnly placeholder="—" />
           </div>
@@ -324,27 +322,26 @@ export default function DivergenceNewPage() {
 
         {/* Observação */}
         <div>
-          <label className="label">Observação <span className="text-gray-400 text-xs">(opcional)</span></label>
+          <label className="label">Observação <span className="text-muted-foreground text-xs">(opcional)</span></label>
           <input className="field" value={observation}
             onChange={(e) => setObservation(e.target.value.split('\n').join(''))}
             maxLength={200} placeholder="Observação opcional..." />
         </div>
 
         <button onClick={handleAdd} disabled={!storeCode || !productInput || !quantity}
-          className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white rounded-lg py-2.5 text-sm font-medium hover:bg-blue-700 disabled:opacity-40 transition-colors">
+          className="btn-primary w-full">
           <PlusCircle className="w-4 h-4" /> Adicionar à lista
         </button>
       </div>
 
-      {/* Draft list */}
-      <div className="bg-white rounded-xl border border-gray-200 p-5">
+      <div className="card p-5">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-medium text-gray-900">
+          <h2 className="font-medium">
             Lista ({items.length} item{items.length !== 1 ? 's' : ''})
           </h2>
           {items.length > 0 && (
             <button onClick={() => saveMut.mutate()} disabled={saveMut.isPending}
-              className="flex items-center gap-2 bg-green-600 text-white rounded-lg px-4 py-2 text-sm font-medium hover:bg-green-700 disabled:opacity-50 transition-colors">
+              className="btn-primary bg-green-600 hover:bg-green-700">
               <Save className="w-4 h-4" />
               {saveMut.isPending ? 'Salvando...' : 'Salvar tudo'}
             </button>

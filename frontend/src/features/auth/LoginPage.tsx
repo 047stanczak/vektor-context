@@ -4,6 +4,10 @@ import { toast } from 'sonner'
 import { loginApi } from './api'
 import { useAuth } from './AuthContext'
 import { BarChart2, Lock, User } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function LoginPage() {
   const [codeUser, setCodeUser] = useState('')
@@ -32,48 +36,27 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4"
-      style={{ background: 'linear-gradient(135deg, #0f1117 0%, #1a1f2e 50%, #0f1117 100%)' }}>
+    <div className="login-page">
+      <div className="login-glow" />
 
-      {/* Background glow */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(79,126,248,0.12) 0%, transparent 70%)' }} />
-      </div>
-
-      <div className="relative w-full max-w-sm fade-in">
-        {/* Card */}
-        <div className="rounded-2xl p-8"
-          style={{
-            background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.08)',
-            backdropFilter: 'blur(20px)',
-          }}>
-
-          {/* Logo */}
-          <div className="flex flex-col items-center mb-8">
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4"
-              style={{ background: 'var(--accent)', boxShadow: '0 0 24px rgba(79,126,248,0.5)' }}>
-              <BarChart2 className="w-6 h-6 text-white" />
-            </div>
-            <h1 className="text-xl font-bold text-white">VektorContext</h1>
-            <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>Sistema de divergências</p>
+      <Card className="login-card fade-in relative">
+        <CardHeader className="items-center text-center">
+          <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-md">
+            <BarChart2 className="h-6 w-6" />
           </div>
+          <CardTitle className="text-xl">VektorContext</CardTitle>
+          <CardDescription>Sistema de divergências</CardDescription>
+        </CardHeader>
 
+        <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5"
-                style={{ color: 'rgba(255,255,255,0.5)' }}>Usuário</label>
-              <div className="relative">
-                <User className="absolute left-3.5 top-2.5 w-4 h-4" style={{ color: 'rgba(255,255,255,0.3)' }} />
-                <input
-                  className="w-full rounded-xl px-3.5 py-2.5 pl-10 text-sm text-white placeholder:text-gray-600 focus:outline-none transition-all duration-150"
-                  style={{
-                    background: 'rgba(255,255,255,0.06)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                  }}
-                  onFocus={(e) => (e.target.style.borderColor = 'rgba(79,126,248,0.6)')}
-                  onBlur={(e) => (e.target.style.borderColor = 'rgba(255,255,255,0.1)')}
+            <div className="space-y-2">
+              <Label htmlFor="codeUser">Usuário</Label>
+              <div className="field-icon-wrap">
+                <User className="field-icon" />
+                <Input
+                  id="codeUser"
+                  className="field-with-icon"
                   value={codeUser}
                   onChange={(e) => setCodeUser(e.target.value)}
                   placeholder="Código do usuário"
@@ -81,37 +64,28 @@ export default function LoginPage() {
                 />
               </div>
             </div>
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5"
-                style={{ color: 'rgba(255,255,255,0.5)' }}>Senha</label>
-              <div className="relative">
-                <Lock className="absolute left-3.5 top-2.5 w-4 h-4" style={{ color: 'rgba(255,255,255,0.3)' }} />
-                <input
+
+            <div className="space-y-2">
+              <Label htmlFor="password">Senha</Label>
+              <div className="field-icon-wrap">
+                <Lock className="field-icon" />
+                <Input
+                  id="password"
                   type="password"
-                  className="w-full rounded-xl px-3.5 py-2.5 pl-10 text-sm text-white placeholder:text-gray-600 focus:outline-none transition-all duration-150"
-                  style={{
-                    background: 'rgba(255,255,255,0.06)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                  }}
-                  onFocus={(e) => (e.target.style.borderColor = 'rgba(79,126,248,0.6)')}
-                  onBlur={(e) => (e.target.style.borderColor = 'rgba(255,255,255,0.1)')}
+                  className="field-with-icon"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                 />
               </div>
             </div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full rounded-xl py-2.5 text-sm font-bold text-white transition-all duration-150 active:scale-[0.98] mt-2"
-              style={{ background: loading ? 'rgba(79,126,248,0.5)' : 'var(--accent)', boxShadow: '0 4px 20px rgba(79,126,248,0.35)' }}
-            >
+
+            <Button type="submit" className="w-full" disabled={loading}>
               {loading ? 'Entrando...' : 'Entrar'}
-            </button>
+            </Button>
           </form>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }
